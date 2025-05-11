@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>更詳細的 ACL 權限 | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="更詳細的 ACL 權限">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="就不會門窗都打開開。">
+<meta property="og:description" content="就不會門窗都打開開。">
+<link rel="canonical" href="http://localhost:4000/linux/2022/03/16/Centos-7-ACL-permission-10.html">
+<meta property="og:url" content="http://localhost:4000/linux/2022/03/16/Centos-7-ACL-permission-10.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-03-16T00:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="更詳細的 ACL 權限">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GiantFred"},"dateModified":"2022-03-16T00:00:00+08:00","datePublished":"2022-03-16T00:00:00+08:00","description":"就不會門窗都打開開。","headline":"更詳細的 ACL 權限","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/linux/2022/03/16/Centos-7-ACL-permission-10.html"},"url":"http://localhost:4000/linux/2022/03/16/Centos-7-ACL-permission-10.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">更詳細的 ACL 權限</h1>
+  <h2 class="post-subtitle"></h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2022-03-16T00:00:00+08:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Mar 16, 2022
+    </time>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 3 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/tags.html#acl%20permission">#acl permission</a><a class="post-tag" href="/tags.html#centos">#centos</a>
+</div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>setfacl 2.2.51</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一acl-權限介紹">一、ACL 權限介紹</h2>
+<p>ACL 是 Access Control List 的縮寫。</p>
+
+<p>主要功能是提供比傳統的 owner, group, others 的 read, write, execute 權限之外的更細部權限設定。</p>
+
+<p>ACL 可以針對單一使用者、單一檔案或目錄來進行 r, w, x 的權限規範，對於需要特殊權限的使用狀況非常有幫助。</p>
+
+<h2 id="二查看-linux-kernel-是否啟動-acl">二、查看 Linux Kernel 是否啟動 ACL</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>dmesg | <span class="nb">grep</span> <span class="nt">-i</span> acl
+</code></pre></div></div>
+
+<h2 id="三查看-acl-版本">三、查看 ACL 版本</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">--version</span>
+</code></pre></div></div>
+
+<h2 id="四設定-acl-權限">四、設定 ACL 權限</h2>
+<h3 id="1acl-指令結構">1、ACL 指令結構</h3>
+<p>setfacl -m 為設定的主要指令與選項。<br>
+而設定的項目則主要有：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>針對個人： u:[帳號名稱]:rwx- <span class="o">[</span>資料夾或檔案]
+針對群組： g:[群組名稱]:rwx- <span class="o">[</span>資料夾或檔案]
+u::r-- 當帳號或群組名稱沒有寫的時候，代表為檔案擁有者的帳號與群組之意
+
+<span class="c"># 參數說明：</span>
+<span class="c"># -R：遞迴，若是目錄，此選項會讓目錄下的所有都擁有所設定的 ACL 權限</span>
+<span class="c"># -d：預設權限，在此目錄下新建立的所有會自動的擁有此「預設權限」。原本就存在該目錄內的徑物並不會被此預設權限影響，是新建立的才會</span>
+</code></pre></div></div>
+
+<h3 id="2acl-指令">2、ACL 指令</h3>
+<h4 id="1-遮罩-mask">(1) 遮罩 mask</h4>
+<p>透過 mask 來規範最大允許的權限，可以避免不小心手誤開放超大的權限給使用者或群組。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">-m</span> m::x /your/file
+</code></pre></div></div>
+<blockquote>
+  <p>基本上如果特定使用者有 rx 的權限，但 mask 只有 x 的話，實際上特定使用者可以取得的權限僅有 x 而已。</p>
+</blockquote>
+
+<h4 id="2-列出資料夾或檔案的-acl-權限資訊">(2) 列出資料夾或檔案的 ACL 權限資訊</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>getfacl <span class="o">[</span>folder/file]
+</code></pre></div></div>
+
+<h4 id="3-針對特定使用者設定-acl-權限">(3) 針對特定使用者設定 ACL 權限</h4>
+<p>讓特定特定使用者 fred 對檔案 grouptest 擁有 r 跟 x 的 ACL 權限。</p>
+
+<p>一開始先新增一個 test 檔案，然後查看它的基本權限。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">touch </span>filetest
+<span class="nv">$ </span>ll filetest
+<span class="nt">-rw-r--r--</span> 1 root root 0 Mar 16 11:24 filetest
+</code></pre></div></div>
+
+<p>接下來使用 ACL 權限設定：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">-m</span> u:fred:rx filetest
+<span class="nv">$ </span>ll <span class="nb">test</span>
+<span class="nt">-rw-r-xr--</span>+ 1 root root 0 Mar 16 11:24 filetest<span class="k">*</span>
+</code></pre></div></div>
+
+<p>查看 filetest 檔案的 ACL 權限</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>getfacl filetest
+<span class="c"># file: filetest</span>
+<span class="c"># owner: root</span>
+<span class="c"># group: root</span>
+user::rw-      &lt;<span class="o">==</span>預設的擁有者權限
+user:fred:r-x  &lt;<span class="o">==</span>針對 fred 的權限
+group::r--     &lt;<span class="o">==</span>預設的群組權限
+mask::r-x      &lt;<span class="o">==</span>預設的 mask 權限
+other::r--
+</code></pre></div></div>
+<p>就可以知道 filetest 檔案對於使用者 fred 有另外給 r 跟 x 的權限。</p>
+
+<h4 id="4-針對特定群組設定-acl-權限">(4) 針對特定群組設定 ACL 權限</h4>
+<p>讓特定群組 fredhome 對檔案 grouptest 擁有 w 跟 x 的 ACL 權限。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">touch </span>grouptest
+<span class="nv">$ </span>ll grouptest
+<span class="nt">-rw-r--r--</span> 1 root root 0 Mar 16 11:35 grouptest
+</code></pre></div></div>
+
+<p>接下來使用 ACL 權限設定：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">-m</span> g:fredhome:wx grouptest
+<span class="nv">$ </span>ll <span class="nb">test</span>
+<span class="nt">-rw-rwxr--</span>+ 1 root root 0 Mar 16 11:35 grouptest<span class="k">*</span>
+</code></pre></div></div>
+
+<p>查看 grouptest 檔案的 ACL 權限</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>getfacl grouptest
+<span class="c"># file: grouptest</span>
+<span class="c"># owner: root</span>
+<span class="c"># group: root</span>
+user::rw-
+group::r--
+group:fredhome:-wx
+mask::rwx
+other::r--
+</code></pre></div></div>
+<p>就可以知道 grouptest 檔案對於群組 fredhome 有另外給 w 跟 x 的權限。</p>
+
+<h4 id="5-移除指定-acl-權限">(5) 移除指定 ACL 權限</h4>
+<p>移除指定的 ACL 權限，可以使用 -x 參數，移除 ACL 權限時<strong>不需要指定權限內容</strong>。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">-x</span> u:fred /your/file
+</code></pre></div></div>
+
+<h4 id="6-刪除所有新增的-acl-權限">(6) 刪除所有新增的 ACL 權限</h4>
+<p>但預設的 ACL 規則（owner, group, others）將被保留。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">-b</span> /your/file
+</code></pre></div></div>
+
+<h4 id="7-刪除預設的-acl-權限">(7) 刪除預設的 ACL 權限</h4>
+<p>如果沒有預設規則，將不提示。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>setfacl <span class="nt">-k</span> /your/folder
+</code></pre></div></div>
+
+<h4 id="8-繼承-acl-權限">(8) 繼承 ACL 權限</h4>
+<p>如果想讓特定資料夾下的新檔案都可以自動繼承特定的 ACL 權限設定，<br>
+可以在資料夾加上預設的 ACL 權限，<br>
+預設 ACL 權限的表示法就是在一般 ACL 權限之前加上 d: 或 default:。</p>
+<blockquote>
+  <p>要注意此參數 d 只對資料夾有效。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 讓指定的資料夾有給使用者 fred 擁有 r 跟 x 權限的預設 ACL 權限</span>
+<span class="nv">$ </span>setfacl <span class="nt">-m</span> d:u:fred:rx /your/folder
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://crmne0707.pixnet.net/blog/post/322350222-linux-acl%E6%AC%8A%E9%99%90">linux ACL權限</a></li>
+  <li><a href="https://ithelp.ithome.com.tw/articles/10221185">[Day 10] Linux 細部權限 ACL</a></li>
+  <li><a href="https://kknews.cc/code/y2kmek.html">大神親自教你如何用Linux acl命令實現文件權限管理</a></li>
+</ul>
+
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/linux/2022/03/15/Centos-7-use-Denyhosts-9.html" title="Centos 7 安裝 DenyHosts 教學">
+          <div>Centos 7 安裝 DenyHosts 教學</div>
+        </a><a class="next" href="/linux/2022/03/23/What-is-rootkit-and-Centos-7-use-rkhunter-11.html" title="用 rkhunter 把 rootkit 通通抓起來！">
+          <div>用 rkhunter 把 rootkit 通通抓起來！</div>
+        </a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li class="top-post">
+          <a class="post-link" href="/jekyll/2015/01/01/welcome-to-jekyll.html" title="Welcome to Jekyll!">
+            Welcome to Jekyll!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/markdown/2018/05/26/mathjax-test.html" title="Mathjax Test">
+            Mathjax Test<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html" title="利用 Docker Compose 管理多個 Container">
+            利用 Docker Compose 管理多個 Container<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/linux/2022/03/09/Linux-iptables-7.html" title="Iptables 及常用指令介紹">
+            Iptables 及常用指令介紹<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

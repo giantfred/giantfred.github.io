@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>利用 Docker Compose 管理多個 Container | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="利用 Docker Compose 管理多個 Container">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="呱呱。">
+<meta property="og:description" content="呱呱。">
+<link rel="canonical" href="http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html">
+<meta property="og:url" content="http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-07-05T00:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="利用 Docker Compose 管理多個 Container">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GiantFred"},"dateModified":"2022-07-05T00:00:00+08:00","datePublished":"2022-07-05T00:00:00+08:00","description":"呱呱。","headline":"利用 Docker Compose 管理多個 Container","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html"},"url":"http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">利用 Docker Compose 管理多個 Container</h1>
+  <h2 class="post-subtitle"></h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2022-07-05T00:00:00+08:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Jul 05, 2022
+    </time>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 14 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/tags.html#centos">#centos</a><a class="post-tag" href="/tags.html#docker">#docker</a><a class="post-tag" href="/tags.html#container">#container</a><a class="post-tag" href="/tags.html#docker-compose">#docker-compose</a>
+</div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>Docker 1.13.1</td>
+    </tr>
+    <tr>
+      <td>docker-compose version 1.18.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一docker-compose-介紹">一、Docker Compose 介紹</h2>
+<p>Docker Compose 主要是來管理需要同時運行多個 Docker Container 的狀況。</p>
+
+<p>透過 docker-compose.yml 和 docker-compose 指令，加上對 Dockerfile 的支援，快速將多個 Docker Container 分別建立並串接在同一個網路下進行整合，並用簡便的指令來管理同一個 docker-compose.yml 所啟動的 Docker Container。</p>
+
+<h2 id="二什麼情況會需要用到-docker-compose">二、什麼情況會需要用到 Docker Compose？</h2>
+
+<ul>
+  <li>開發、測試環境或正式運行的生產環境皆可使用</li>
+  <li>所使用的應用系統會需要連結或整合一個以上的 Container</li>
+  <li>想達到更彈性和自動化的部署</li>
+</ul>
+
+<h2 id="三一個-container-或多個-container">三、一個 Container 或多個 Container？</h2>
+<p>不建議將應用系統需要的服務和元件都放進同一個 Docker Container 裡面，因為設定工作會變複雜，而且這種 Docker Image 在啟動時，會需要更多的環境變數和啟動設定才能順利啟動。</p>
+
+<p>建議把應用系統需要的服務和元件都製作成不同的 Docker Image，然後透過 Docker Compose 設定、整合和啟動所需的 Container，這樣能善用分散式運算的能力，每項服務都可以依需要獨立擴充和抽拔，更有效率。</p>
+
+<h2 id="四在-centos-安裝-docker-compose">四、在 CentOS 安裝 Docker Compose</h2>
+<p>Docker 和 Docker Compose 是各自獨立的程式，版本號碼也不同步，所以需要分別手動安裝。</p>
+
+<h3 id="1-用-yum-套件安裝">1. 用 yum 套件安裝</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>docker-compose
+</code></pre></div></div>
+
+<h3 id="2-用-pip-安裝">2. 用 pip 安裝</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 安裝 pip</span>
+<span class="nv">$ </span>yum <span class="nb">install </span>python-pip
+
+<span class="c"># 升級 pip</span>
+<span class="nv">$ </span>pip <span class="nb">install</span> <span class="nt">--upgrade</span> pip
+
+<span class="c"># 安裝 docker compose</span>
+<span class="nv">$ </span>pip <span class="nb">install </span>docker-compose
+
+<span class="c"># 建立連結檔</span>
+<span class="nv">$ </span><span class="nb">ln</span> <span class="nt">-s</span> /usr/local/bin/docker-compose /usr/bin/docker-compose
+</code></pre></div></div>
+
+<p>安裝完後，查看 Docker Compose 版本：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose <span class="nt">-v</span>
+<span class="nv">$ </span>docker-compose version
+
+docker-compose version 1.18.0, build 8dd22a9
+</code></pre></div></div>
+
+<h2 id="五用範例了解-docker-compose-的運作方式">五、用範例了解 Docker Compose 的運作方式</h2>
+<p>Docker Compose 功能主要是由 docker-compose 指令和 docker-compose.yml 組成。</p>
+
+<p>docker-compose 指令可以執行大部分的 docker 指令的選項和功能，但可以直接使用 docker-compose.yml 裡的設定值，而不用像 docker 指令是由選項一一指定。</p>
+
+<p>docker-compose.yml 是採用 YAML 檔案格式來撰寫，是一種以「鍵/值 (Key/Value)」方式指定設定變數與設定值的格式，除了 <code class="language-plaintext highlighter-rouge">version</code> 標籤外，主要是由 <code class="language-plaintext highlighter-rouge">services（服務）</code>、<code class="language-plaintext highlighter-rouge">volumes（資料卷）</code>、<code class="language-plaintext highlighter-rouge">networks（網路）</code> 等三大標籤所構成。</p>
+
+<ul>
+  <li>services：定義和設定此 docker-compose.yml 需要啟動的 Container 資訊，功能和所使用的標籤和 <code class="language-plaintext highlighter-rouge">docker run</code> 相似，都是用於啟動 Container</li>
+  <li>volumes：定義給服務使用資料儲存資訊</li>
+  <li>networks：定義給服務的連結網路資訊</li>
+</ul>
+
+<p>而每個 docker-compose.yml 的檔案結構會有 <code class="language-plaintext highlighter-rouge">version</code>、<code class="language-plaintext highlighter-rouge">services</code>、<code class="language-plaintext highlighter-rouge">volumes</code>、<code class="language-plaintext highlighter-rouge">networks</code>、<code class="language-plaintext highlighter-rouge">configs</code>、<code class="language-plaintext highlighter-rouge">secrets</code> 等六個頂層指令組成，後面會講到。</p>
+
+<h3 id="1-docker-composeyml-範例">1. docker-compose.yml 範例</h3>
+
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/1.jpg" alt=""></p>
+
+<h3 id="2-驗證-docker-composeyml-內容不會真正執行">2. 驗證 docker-compose.yml 內容（不會真正執行）</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose config
+<span class="c"># -f：指定檔案</span>
+<span class="c"># -q：如果一切正常，檢查完成後不顯示出任何訊息（原本會顯示完整的 docker-compose.yml 內容）</span>
+
+<span class="nv">$ </span>docker-compose config <span class="nt">-q</span>
+<span class="nv">$ </span>docker-compose <span class="nt">-f</span> /usr/local/docker-test/node-red/docker-compose.yml config <span class="nt">-q</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/2.jpg" alt=""></p>
+
+<h3 id="3-啟動-docker-composeyml-內所有的服務">3. 啟動 docker-compose.yml 內所有的服務</h3>
+<blockquote class="prompt-info">
+  <p>用 docker-compose.yml 啟動服務，services 名稱前面預設是資料夾名，可以加上 <code class="language-plaintext highlighter-rouge">-p</code> 選項指定專案名稱。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -d：在背景模式執行，如果沒有加上 -d，Container 就會在前景執行</span>
+<span class="nv">$ </span>docker-compose up <span class="nt">-d</span>
+<span class="nv">$ </span>docker-compose <span class="nt">-p</span> 專案名稱 up <span class="nt">-d</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/3.jpg" alt=""></p>
+
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/4.jpg" alt=""></p>
+
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/5.jpg" alt=""></p>
+
+<p>可以看到剛建立的資料卷及網路前面都會加上「nodered_」字串，是因為那個字串預設會是 docker-compose.yml 所在資料夾的名稱，並會移除資料夾名稱中的非英數字元，如果想指定專案名稱可以加上 <code class="language-plaintext highlighter-rouge">-p</code> 選項。</p>
+
+<h3 id="4-執行-docker-composeyml-內的服務">4. 執行 docker-compose.yml 內的服務</h3>
+<blockquote class="prompt-info">
+  <p>docker-compose 指令幾乎只接受 <strong>services 名稱</strong>，而不是 Container 名稱，所以不一定要特別設定 Container 名稱，這樣也可以避免 Container 名稱衝突而無法建立成功。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose <span class="nb">exec</span> 
+<span class="nv">$ </span>docker-compose <span class="nb">exec</span> <span class="nt">-it</span> db /bin/bash （db 是 services 名稱）
+</code></pre></div></div>
+<blockquote class="prompt-warning">
+  <p>注意！如果是用 <code class="language-plaintext highlighter-rouge">docker exec</code> 就要使用 Container 名稱。 
+<code class="language-plaintext highlighter-rouge">docker exec -it node-red-counchdb</code></p>
+</blockquote>
+
+<h2 id="六dockerfile-和-docker-composeyml-差異">六、Dockerfile 和 docker-compose.yml 差異</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>名稱</th>
+      <th>所屬的腳本檔</th>
+      <th>用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dockerfile</td>
+      <td>docker build</td>
+      <td>注重在如何產生一個新的 Image</td>
+    </tr>
+    <tr>
+      <td>docker-compose.yml</td>
+      <td>Docker Compose</td>
+      <td>比較像 <code class="language-plaintext highlighter-rouge">docker run</code>，用來告訴 Docker 如何啟動、運行和連結 Container</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="七docker-composeyml-常用指令">七、docker-compose.yml 常用指令</h2>
+<h3 id="1-version">1. version</h3>
+<p><strong>用途：指定該 docker-compose.yml 檔案所使用的格式版本。</strong></p>
+
+<p>不同的 Docker 及 Docker Compose 版本所支援的 docker-compose.yml 格式和指令略有不同，而 docker-compose.yml 共有三個主要版本，最新版本是 Version 3.8 (2022/07)，各版本差異主要是在 yaml 檔案可以使用的指令數不同，版本越新支援越多指令。</p>
+
+<p>docker-compose.yml 版本和 Docker 版本相關，舊版 Docker 上無法用新版的 docker-compose.yml 格式。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3"</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3.0"</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3.8"</span>
+</code></pre></div></div>
+
+<h3 id="2-services">2. services</h3>
+<p><strong>用途：指定該 docker-compose.yml 檔案需要啟動的所有的 Container 的啟動及設定資訊。</strong></p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span> 
+    <span class="na">image</span><span class="pi">:</span> <span class="s">xxxxxxxx</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">xxxxxxxxx</span>
+</code></pre></div></div>
+
+<h3 id="3-container_name">3. container_name</h3>
+<p><strong>用途：指定每一個 service 下的 Container 名稱。</strong></p>
+
+<p>不過由 docker-compose.yml 啟動的 Container 都可以透過 docker-compose 指令和 services 名稱進行操作，因此 Container 的名稱就不用非要指定。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span> 
+    <span class="na">image</span><span class="pi">:</span> <span class="s">xxxxxxxx</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">node-red-web</span>
+</code></pre></div></div>
+
+<h3 id="4-image">4. image</h3>
+<p><strong>用途：指定某一個 service 所要使用的 image 檔案名稱和標籤。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 <code class="language-plaintext highlighter-rouge">docker run</code> 和 Dockerfile 的 <code class="language-plaintext highlighter-rouge">FROM</code> 相同。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.13.3</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">ayubiz/nginx</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">ayubiz/nginx:1.13.3</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">f4114aea</span>
+</code></pre></div></div>
+
+<h3 id="5-build">5. build</h3>
+<p><strong>用途：另一種取得 image 的方式，只要指定 Dockerfile 所在的資料夾即可。</strong></p>
+
+<h4 id="1-如果檔案名稱叫做-dockerfile">(1) 如果檔案名稱叫做 Dockerfile</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">/home/ayubiz</span>
+</code></pre></div></div>
+
+<h4 id="2-如果檔案名稱是自訂的要多加一個-dockerfile-指令">(2) 如果檔案名稱是自訂的，要多加一個 dockerfile 指令</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">/home/ayubiz</span>
+    <span class="na">dockerfile</span><span class="pi">:</span> <span class="s">ayu.txt</span>
+</code></pre></div></div>
+
+<h4 id="3-如果需要更改產出的-image-檔案的名稱和標籤可以同時使用-build-和-image-指令">(3) 如果需要更改產出的 image 檔案的名稱和標籤，可以同時使用 build 和 image 指令</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">. (目前所在資料夾)</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">ayubiz:demo</span>
+</code></pre></div></div>
+
+<h3 id="6-command">6. command</h3>
+<p><strong>用途：指定 Container 啟動後執行的指令，用以取代掉 Image 檔案內原有的啟動指令（改變 Container 原有的執行指令）。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 Dockerfile 的 <code class="language-plaintext highlighter-rouge">CMD</code> 相同。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">nginx"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">-g"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">daemon</span><span class="nv"> </span><span class="s">off;"</span><span class="pi">]</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">nginx -g "daemon off;"</span>
+</code></pre></div></div>
+
+<h3 id="7-entrypoint">7. entrypoint</h3>
+<p><strong>用途：覆寫掉 Image 檔案內原有的 ENTRYPOINT 指令。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 Dockerfile 的 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 類似。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">entrypiont</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">nignx</span>
+      <span class="pi">-</span> <span class="s">g</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">daemon</span><span class="nv"> </span><span class="s">off;"</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">nginx -g "daemon off;"</span>
+</code></pre></div></div>
+
+<h3 id="8-environment">8. environment</h3>
+<p><strong>用途：用以設定該 services 的環境變數。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 docker run -e 或是 Dockerfile 的 <code class="language-plaintext highlighter-rouge">ENV</code> 類似。</p>
+</blockquote>
+
+<p>平常設定值不需要使用雙引號，不過 YAML 檔會解析 <code class="language-plaintext highlighter-rouge">true/false</code> 及 <code class="language-plaintext highlighter-rouge">yes/no</code> 這兩組關鍵字，所以會需要加上雙引號避免被轉換成布林值而產生錯誤。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">USER</span><span class="pi">:</span> <span class="s">ayubiz</span>
+      <span class="na">ROOT</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+      <span class="na">NO_PW</span><span class="pi">:</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 此種方式能免去減少雙引號的問題</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">USER</span><span class="pi">:</span> <span class="s">ayubiz</span>
+      <span class="na">ROOT</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+      <span class="na">NO_PW</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<h3 id="9-env_file">9. env_file</h3>
+<p><strong>用途：將變數檔案路徑及檔案名稱事先寫在文字檔，並直接引用到 docker-compose.yml 內，可以省去用 <code class="language-plaintext highlighter-rouge">environment</code> 逐一設定的麻煩。</strong></p>
+
+<blockquote class="prompt-warning">
+  <p>注意！同樣的變數名稱，會以 <code class="language-plaintext highlighter-rouge">environment</code> 指令的設定為準，如果多個變數檔都有設定同一個變數名時，以最後加入的那個檔案的變數值為主。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">env_file</span><span class="pi">:</span> <span class="s">aybiz.txt</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">env_file</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="s">./ayubiz.txt</span>
+      <span class="pi">-</span> <span class="s">./env/ayubiz.txt</span>
+      <span class="pi">-</span> <span class="s">/tmp/ayubiz.txt</span>
+</code></pre></div></div>
+
+<h3 id="10-expose">10. expose</h3>
+<p><strong>用途：用以設定要啟用的連結埠號。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 Dockerfile 的 <code class="language-plaintext highlighter-rouge">EXPOSE</code> 相同。</p>
+</blockquote>
+
+<p>啟用的連結埠號除了提供給同一個 Docker Network 的其他 Container/Service 存取外，並不能直接給主機的程式使用
+避免不必要的錯誤發生，加雙引號會比較安全。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">expose</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443"</span>
+</code></pre></div></div>
+
+<h3 id="11-ports">11. ports</h3>
+<p><strong>用途：將主機的連結埠號對應到 Container/Service 所啟用（Expose）的連結埠號，如果沒有要將 Container/Service 所啟用的連結埠號開給主機上的程式或是其他不在同一個 Docker Network 的 Container 所使用就不需要用到。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 docker run -p 相似。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>       
+  <span class="na">http</span><span class="pi">:</span>       
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>       
+    <span class="na">ports</span><span class="pi">:</span>       
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80"</span>  <span class="c1"># 指定主機的 80 埠對應到 Container 的 80 埠      </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080-8088"</span>   <span class="c1"># 指定主機的 8080 至 8088 之間的埠號對應到 Container 的 8080 至 8088 之間的埠號    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>   <span class="c1"># 指定主機的 80 埠對應到 Container 的 80 埠    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080-8090:80-90"</span>   <span class="c1"># 指定主機的 8080 至 8090 之間的埠號對應到 Container 的 80 至 90 之間的埠號    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">127.0.0.1:8080:80"</span>   <span class="c1"># 指定主機的 127.0.0.1 網址的 8080 埠號對應到 Container 的 80 埠號    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">127.0.0.1:8080-8090:80-90"</span>     <span class="c1"># 指定主機的 127.0.0.1 網址的 8080 至 8090 之間的埠號對應到 Container 的 80 至 90 之間的埠號  </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">16882:16882/udp"</span>   <span class="c1"># 指定主機的 16882 埠號對應到 Container 的 16882 埠號的 UDP 通訊協定    </span>
+</code></pre></div></div>
+
+<h3 id="12-restart">12. restart</h3>
+<p><strong>用途：設定 Container 自動重新啟動的模式。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 <code class="language-plaintext highlighter-rouge">docker run --restart</code> 相同。</p>
+</blockquote>
+
+<p><code class="language-plaintext highlighter-rouge">restart</code> 預設值為 <code class="language-plaintext highlighter-rouge">no</code>，其他設定值可以是 <code class="language-plaintext highlighter-rouge">no</code>、<code class="language-plaintext highlighter-rouge">always</code>、<code class="language-plaintext highlighter-rouge">on-failure</code>、<code class="language-plaintext highlighter-rouge">unless-stopped</code>。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+  <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+</code></pre></div></div>
+
+<h3 id="13-volumes">13. volumes</h3>
+<p><strong>用途：用於掛載主機的資料夾和檔案或外部資料卷到 Container 的指定資料夾或檔案裡</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 <code class="language-plaintext highlighter-rouge">docker run -v</code> 相同。</p>
+</blockquote>
+
+<h4 id="1-services-指令下的-volumes指定-container-要掛載的資料卷">(1) services 指令下的 volumes：指定 Container 要掛載的資料卷</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="c1"># 由 docker 自動建立相同路徑名稱的資料卷掛載到此路徑</span>
+      <span class="pi">-</span> <span class="s">/usr/share/nginx/html</span>
+
+      <span class="c1"># 指定主機的檔案路徑掛載到 Container 的指定路徑</span>
+      <span class="pi">-</span> <span class="s">/home/ayubiz/nginx/html:/usr/share/nginx/html</span>
+
+      <span class="c1"># 將 docker volume 建立的資料卷掛載到 Container 上</span>
+      <span class="pi">-</span> <span class="s">nginx-data:/usr/share/nginx/html</span>
+</code></pre></div></div>
+
+<h4 id="2-與-services-指令同層的-volumes-頂層建立一組新的資料卷">(2) 與 services 指令同層的 volumes （頂層）：建立一組新的資料卷</h4>
+<p>用頂層的 <code class="language-plaintext highlighter-rouge">volumes</code> 建立一個名為 <code class="language-plaintext highlighter-rouge">nginx-data</code> 的資料卷後，就可以使用 services 下的 <code class="language-plaintext highlighter-rouge">volumes</code> 將命名好的資料卷進行掛載。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">nginx-data:/usr/share/nginx/html</span>
+<span class="na">volumes</span><span class="pi">:</span>
+    <span class="s">nginx-data</span>
+</code></pre></div></div>
+
+<h4 id="3-32-版以上-docker-composeyml-檔案格式支援條列式">(3) 3.2 版以上 docker-compose.yml 檔案格式支援條列式</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3.2"</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">volume</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s">nginx-data</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s">/usr/share/nginx/html</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="kc">true</span>
+<span class="na">volumes</span><span class="pi">:</span>
+  <span class="s">nginx-data</span>
+</code></pre></div></div>
+
+<h3 id="14-networks">14. networks</h3>
+<p><strong>指定 Container 要加入的 Docker Network 名稱。</strong></p>
+<h4 id="1-指定-container-要加入的-docker-network-名稱">(1) 指定 Container 要加入的 Docker Network 名稱</h4>
+
+<h4 id="2-與-services-指令同層的-networks頂層建立一組新的-docker-network提供給-services-指令所定義的-containerservice-使用">(2) 與 services 指令同層的 networks（頂層）：建立一組新的 Docker Network，提供給 services 指令所定義的 Container/Service 使用</h4>
+
+<blockquote class="prompt-info">
+  <p>可以使用頂層的 <code class="language-plaintext highlighter-rouge">networks</code> 定義多個 Docker Network，且每一個 services 下的 Container 也可以透過 <code class="language-plaintext highlighter-rouge">networks</code> 同時加入多個 Docker Network。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">node-red-net</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">counchdb:latest</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">node-red-net</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="s">node-red-net</span>
+</code></pre></div></div>
+
+<h3 id="15-depends_on">15. depends_on</h3>
+<p><strong>用途：可以改變 docker-compose.yml 檔案裡面各個 Container/Service 的啟動順序。</strong></p>
+
+<p>只要在 <code class="language-plaintext highlighter-rouge">node-red</code> 服務下方加上下面的 <code class="language-plaintext highlighter-rouge">depends_on</code>，就可以讓 <code class="language-plaintext highlighter-rouge">node_red</code> 在 <code class="language-plaintext highlighter-rouge">db</code> 啟動完成後再啟動，但可能會發生 <code class="language-plaintext highlighter-rouge">node-red</code> 在 <code class="language-plaintext highlighter-rouge">db</code> 啟動完成後要啟動，但 Couchdb Server 還沒有啟動完成而無法連線的問題。</p>
+
+<blockquote class="prompt-warning">
+  <p>注意！啟動完成是指 Container 本身，不是 Container 內的程式或服務啟動完成。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">db"</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">counchdb:latest</span>
+</code></pre></div></div>
+
+<h3 id="16-external_links--link">16. external_links | link</h3>
+<p>這兩個指令大部分已經可以透過 Docker Nerwork 功能自動達成，建議改用 <code class="language-plaintext highlighter-rouge">networks</code> 建立 Docker Network 達成相關功能。</p>
+
+<h3 id="17-extra_hosts">17. extra_hosts</h3>
+<p><strong>用途：設定其他主機的 IP 和網域名稱做對應，設定完後打開 /etc/hosts 檔案會發現多出剛剛設定的紀錄。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>和直接去 Container 的 /etc/hosts 檔案裡加入新的主機的作用相同。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">extra_hosts</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">webapp1:192.168.1.10"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">webapp2:192.168.99.101"</span>
+</code></pre></div></div>
+
+<h3 id="18-dns">18. dns</h3>
+<p><strong>用途：設定 DNS 伺服器，該服務啟動的 Container 的 DNS 伺服器就會被變更為設定的 DNS 伺服器位址。</strong></p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">services"</span>
+  <span class="s">node-red</span><span class="err">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">dns</span><span class="pi">:</span> <span class="s">9.9.9.9</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">couchdb:latest</span>
+    <span class="na">dns</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="s">168.95.1.1</span>
+       <span class="s">- 168.95.192.1</span>
+</code></pre></div></div>
+
+<h3 id="19-labels">19. labels</h3>
+<p><strong>用途：將 Image 檔的作者、版本、描述、其他自訂資訊儲存到新產生的 Image 檔。</strong></p>
+<blockquote class="prompt-info">
+  <p>用途和 Dockerfile 的 <code class="language-plaintext highlighter-rouge">LABEL</code> 相同。</p>
+</blockquote>
+
+<h2 id="八docker-compose-常用指令">八、Docker Compose 常用指令</h2>
+<p>用 docker-compose 指令操作的好處在於可以對指定的 docker-compose.yml 檔案內所啟動的 Container 做整批的操作，而不需要一個一個處理。</p>
+
+<p>docker-compose 指令必須在有 docker-compose.yml 檔案路徑和名稱才能夠正常使用。</p>
+
+<h3 id="1-config">1. config</h3>
+<p><strong>用途：驗證或檢視  docker-compose.yml 的內容，而不用透過實際執行才能發現錯誤。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose config
+</code></pre></div></div>
+
+<h3 id="2-build">2. build</h3>
+<p><strong>用途：如果 docker-compose.yml 檔案裡有使用到 Dockerfile 來產生 Docker Image 的話，可以使用 <code class="language-plaintext highlighter-rouge">build</code> 來產生所需的 Docker Image，但如果 docker-compose.yml 檔案裡沒有指定 Dockerfile，用 <code class="language-plaintext highlighter-rouge">build</code> 就不會有任何產出。</strong></p>
+
+<p>如果所使用的 Dockerfile 的內容有變動時，也可以使用 <code class="language-plaintext highlighter-rouge">build</code> 重新產生 docker image。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose build          
+</code></pre></div></div>
+
+<h3 id="3-pull">3. pull</h3>
+<p><strong>用途：下載 docker-compose.yml 中指定要取得的 Image，可指定一或多個服務的名稱，若沒指定就會下載 docker-compose.yml 檔案裡所有指定的 Image 檔。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose pull node-red db         
+<span class="nv">$ </span>docker-compose pull
+</code></pre></div></div>
+
+<h3 id="4-start--stop--restart--pause--unpause--kill">4. start | stop | restart | pause | unpause | kill</h3>
+<p><strong>用途：啟動、停止、重新啟動、暫停、取消暫停和強制停止 docker-compose.yml 檔案內的 Container。</strong>        <br>
+如果不指定 Container，會預設對 docker-compose.yml 檔案內所有 Container 做操作（譬如：不指定就會停止所有 Container 的運行）。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose stop         
+<span class="nv">$ </span>docker-compose stop node-red db
+</code></pre></div></div>
+
+<h3 id="5-rm">5. rm</h3>
+<p><strong>用途：移除已經停止運行的 Container，可指定一或多個 Container 的名稱，若沒指定就會移除 docker-compose 檔案裡全部停用的 Container。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -s 可以移除仍在運行中的 Container         </span>
+<span class="nv">$ </span>docker-compose <span class="nb">rm</span> <span class="nt">-v</span>          
+<span class="nv">$ </span>docker-compose <span class="nb">rm</span> <span class="nt">-v</span> node-red           
+<span class="nv">$ </span>docker-compose <span class="nb">rm</span> <span class="nt">-s</span> node-red
+</code></pre></div></div>
+
+<h3 id="6-run">6. run</h3>
+<p><strong>用途：主要是利用 <code class="language-plaintext highlighter-rouge">services</code> 所設定好的各項設定值，然後搭配要執行的命令來啟動服務。</strong></p>
+
+<p>docker-compose run 的選項有：<code class="language-plaintext highlighter-rouge">-d</code>、<code class="language-plaintext highlighter-rouge">--name</code>、<code class="language-plaintext highlighter-rouge">--rm</code>、<code class="language-plaintext highlighter-rouge">-p</code>、<code class="language-plaintext highlighter-rouge">--entrypoint</code>、<code class="language-plaintext highlighter-rouge">--workdir</code>、<code class="language-plaintext highlighter-rouge">-v</code>、<code class="language-plaintext highlighter-rouge">--no-deps</code>。</p>
+
+<p><code class="language-plaintext highlighter-rouge">--no-deps</code>：啟動服務時，不去啟動相連或相依的服務。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># node-red 是 services 名稱不是 Image 名稱</span>
+<span class="nv">$ </span>docker-compose run node-red         
+</code></pre></div></div>
+
+<h3 id="7-up最常用的指令">7. up（最常用的指令）</h3>
+<p><strong>用途：將撰寫好的 docker-compose.yml 建立，並啟動所有的服務。</strong></p>
+
+<p>用 docker-compose.yml 啟動 Container，若沒另外指定專案名稱，預設是資料夾名。</p>
+
+<p><code class="language-plaintext highlighter-rouge">--no-recreate</code>：無論  docker-compose.yml 或 Image 檔有無調整或改變，都不需要重製每個服務所使用的 Container        <br>
+<code class="language-plaintext highlighter-rouge">--force-recreate</code>：無論  docker-compose.yml 或 Image 檔有無調整或改變，都要強迫執行重新建立服務所使用的 Container 的動作</p>
+
+<blockquote class="prompt-info">
+  <p>注意！ <code class="language-plaintext highlighter-rouge">--no-recreate</code> 和 <code class="language-plaintext highlighter-rouge">--force-recreate</code> 對於已經啟動的服務的 Container 都會先停止運行後，再依要求只重新啟動或重建後重新啟動。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -d：在背景模式執行，如果沒有加上 -d，Container 就會在前景執行          </span>
+<span class="nv">$ </span>docker-compose up <span class="nt">-d</span>          
+<span class="nv">$ </span>docker-compose <span class="nt">-p</span> 專案名稱 up  <span class="nt">-d</span>         
+</code></pre></div></div>
+
+<h3 id="8-version">8. version</h3>
+<p><strong>用途：查看 docker-compose 版本的方式。</strong></p>
+
+<h3 id="9-logs">9. logs</h3>
+<p><strong>用途：查看 Container 所輸出的 log 訊息。</strong>       <br>
+跟 <code class="language-plaintext highlighter-rouge">docker logs</code> 用途和用法相同，但 <code class="language-plaintext highlighter-rouge">docker-compose logs</code> 不支援以指定的起始時間查詢 log 及額外詳細的 log 顯示方式。</p>
+
+<h3 id="10-port">10. port</h3>
+<p><strong>用途：查詢 Container 內部的通訊埠所對應的外部 IP 位址和通訊埠號。</strong>      <br>
+與 <code class="language-plaintext highlighter-rouge">docker ps</code> 差別在於 <code class="language-plaintext highlighter-rouge">docker ps</code> 不用指定要查詢的通訊埠號。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查詢 node-red 服務的 1880 埠號在 Container 外所對應的 IP 位址和通訊埠號       </span>
+<span class="nv">$ </span>docker-compose port node-red 1880  
+</code></pre></div></div>
+
+<h3 id="11-ps">11. ps</h3>
+<p><strong>用途：顯示所使用的 docker-compose.yml 在 services 項目下定義的 Container 的狀態（包含啟動中和非啟動中），並不是所有的 Container 的狀態。</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose ps         
+
+<span class="c"># 只顯示 Container ID 資訊</span>
+<span class="nv">$ </span>docker-compose ps <span class="nt">-q</span>    
+</code></pre></div></div>
+
+<h3 id="12-help">12. help</h3>
+<p><strong>用途：查訊個別指令選項的使用方式和參數</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose start <span class="nt">--help</span>     
+
+<span class="c"># docker 指令不支援這個操作      </span>
+<span class="nv">$ </span>docker-compose start -?       
+</code></pre></div></div>
+
+<h2 id="九何時要使用-docker-compose-指令">九、何時要使用 Docker Compose 指令？</h2>
+<p>docker-compose 指令和 docker 指令相同，所以時常會搞不清楚要用那個指令。</p>
+
+<p>經過上面可知，docker-compose 指令操作都是基於 docker-compose.yml，如果想要操作的 Container 是由某一個 docker-compose.yml 檔案所定義和產生時，就用 docker-compose 指令來操作，可以少打一些字，因為它會自動去參考 docker-compose.yml 的相關設定。</p>
+
+<p>docker-compose 指令可以容易的進行批次操作，可以一次啟用或停用 docker-compose.yml 所定義的所有的 Container，不用像 docker 指令要一一列出想用啟用或停用的 Container。</p>
+
+<p>另外，docker 指令使用 Container 名稱作為指令的參數，而 docker-compose 指令則多是以 docker-compose.yml 檔案裡的「服務名稱」來作為參數使用，不直接給 Container 的名稱。</p>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li>Docker 這樣學才有趣：從入門，到玩直播、挖礦</li>
+</ul>
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/docker/2022/06/16/Create-docker-image-21.html" title="各種自製 Docker Image 的方法">
+          <div>各種自製 Docker Image 的方法</div>
+        </a><a class="next" href="/feeling/2022/07/07/The-first-post-in-feeling-23.html" title="有關 Feeling 這個分類項目">
+          <div>有關 Feeling 這個分類項目</div>
+        </a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li class="">
+          <a class="post-link" href="/review/2022/02/25/The-first-post-in-review-5.html" title="有關 Review 這個分類項目">
+            有關 Review 這個分類項目<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/jekyll/2022/02/18/Welcome-to-jekyll-1.html" title="Welcome to Fred's Blog!">
+            Welcome to Fred's Blog!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="top-post">
+          <a class="post-link" href="/jekyll/2015/01/01/welcome-to-jekyll.html" title="Welcome to Jekyll!">
+            Welcome to Jekyll!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html" title="哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能">
+            哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

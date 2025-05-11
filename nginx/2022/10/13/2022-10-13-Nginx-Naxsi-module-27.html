@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能 | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="人外有天，牆外有牆。">
+<meta property="og:description" content="人外有天，牆外有牆。">
+<link rel="canonical" href="http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html">
+<meta property="og:url" content="http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-10-13T00:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GiantFred"},"dateModified":"2022-10-13T00:00:00+08:00","datePublished":"2022-10-13T00:00:00+08:00","description":"人外有天，牆外有牆。","headline":"哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html"},"url":"http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能</h1>
+  <h2 class="post-subtitle"></h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2022-10-13T00:00:00+08:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Oct 13, 2022
+    </time>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 10 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/tags.html#nginx">#nginx</a><a class="post-tag" href="/tags.html#naxsi">#naxsi</a><a class="post-tag" href="/tags.html#module">#module</a>
+</div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>nginx/1.16.1</td>
+    </tr>
+    <tr>
+      <td>Naxsi 1.3</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一waf-介紹">一、WAF 介紹</h2>
+<p>WAF（Web Application Firewall，網站應用程式防火牆），主要為保護網站應用程式，透過監控及過濾 HTTP/HTTPS 請求來分析網路行為，拒絕可疑、惡意流量進入網站，只讓安全且正常的流量通過。</p>
+
+<p>只能即時保護應用程式，不能修復漏洞，但在防禦的同時，可以有緩衝時間修復應用程式的漏洞。</p>
+
+<p>方式：依據事先設計好的安全政策，發掘違反安全政策的封包。<br>
+目的：保護 web 應用程式，防禦 XSS 及 SQL injection 等攻擊。</p>
+
+<ul>
+  <li>支持 POST/GET</li>
+  <li>位於網頁瀏覽者與網頁伺服器中間，專責分析與過濾 「Layer7 應用層」 的網路流量</li>
+  <li>有些更強大的甚至可以掃描惡意木馬文件、防竄改、伺服器優化、備份</li>
+  <li>如果網站有蒐集 cookie、用戶資料、表單紀錄，建議使用 WAF</li>
+</ul>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/WAF.jpg" alt="">
+ （圖片來源：cloudmax 部落格）</p>
+
+<h2 id="二waf-優缺點">二、WAF 優缺點</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>優點</th>
+      <th>缺點</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+<ol>
+  <li>開箱即用</li>
+</ol>
+</td>
+      <td>
+<ol>
+  <li>誤殺、漏報</li>
+</ol>
+</td>
+    </tr>
+    <tr>
+      <td>
+<ol>
+  <li>管理方便，介面友好</li>
+</ol>
+</td>
+      <td>
+<ol>
+  <li>只適合中小型網站</li>
+</ol>
+</td>
+    </tr>
+    <tr>
+      <td>
+<ol>
+  <li>功能豐富</li>
+</ol>
+</td>
+      <td>
+<ol>
+  <li>必須客製化規則才能有效的抵擋攻擊</li>
+</ol>
+</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>
+<ol>
+  <li>功能強大的 WAF 很貴</li>
+</ol>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="三naxsi-模組介紹">三、Naxsi 模組介紹</h2>
+<p>Naxsi 是 Nginx 的第三方模組，與任何 Nginx 版本都相容，採用 GPLv3 授權，可以免費使用，也不需要依賴類似防毒軟體的病毒碼資料庫。</p>
+
+<p>可以建置簡易的 WAF 系統，阻擋一些常見的 Nginx Anti XSS 及 SQL Injection 攻擊，但只能過濾「GET」及「POST」的請求。</p>
+
+<h2 id="四naxsi-的規則檔-naxsi_corerules">四、Naxsi 的規則檔 naxsi_core.rules</h2>
+
+<p>舉例 naxsi_core.rules 內的部份規則：</p>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##################################
+## SQL Injections IDs:1000-1099 ##
+##################################
+</span><span class="n">MainRule</span> <span class="s2">"rx:select|union|update|delete|insert|table|from|ascii|hex|unhex|drop|load_file|substr|group_concat|dumpfile"</span> <span class="s2">"msg:sql keywords"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1000</span>;
+<span class="n">MainRule</span> <span class="s2">"str:\"" "</span><span class="n">msg</span>:<span class="n">double</span> <span class="n">quote</span><span class="s2">" "</span><span class="n">mz</span>:<span class="n">BODY</span>|<span class="n">URL</span>|<span class="n">ARGS</span>|$<span class="n">HEADERS_VAR</span>:<span class="n">Cookie</span><span class="s2">" "</span><span class="n">s</span>:$<span class="n">SQL</span>:<span class="m">8</span>,$<span class="n">XSS</span>:<span class="m">8</span><span class="err">"</span> <span class="n">id</span>:<span class="m">1001</span>;
+<span class="n">MainRule</span> <span class="s2">"str:0x"</span> <span class="s2">"msg:0x, possible hex encoding"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:2"</span> <span class="n">id</span>:<span class="m">1002</span>;
+<span class="c">## Hardcore rules
+</span><span class="n">MainRule</span> <span class="s2">"str:/*"</span> <span class="s2">"msg:mysql comment (/*)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1003</span>;
+<span class="n">MainRule</span> <span class="s2">"str:*/"</span> <span class="s2">"msg:mysql comment (*/)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1004</span>;
+<span class="n">MainRule</span> <span class="s2">"str:|"</span> <span class="s2">"msg:mysql keyword (|)"</span>  <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1005</span>;
+<span class="n">MainRule</span> <span class="s2">"str:&amp;&amp;"</span> <span class="s2">"msg:mysql keyword (&amp;&amp;)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1006</span>;
+<span class="c">## end of hardcore rules
+</span><span class="n">MainRule</span> <span class="s2">"str:--"</span> <span class="s2">"msg:mysql comment (--)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1007</span>;
+<span class="n">MainRule</span> <span class="s2">"str:;"</span> <span class="s2">"msg:semicolon"</span> <span class="s2">"mz:BODY|URL|ARGS"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1008</span>;
+<span class="n">MainRule</span> <span class="s2">"str:="</span> <span class="s2">"msg:equal sign in var, probable sql/xss"</span> <span class="s2">"mz:ARGS|BODY"</span> <span class="s2">"s:$SQL:2"</span> <span class="n">id</span>:<span class="m">1009</span>;
+<span class="n">MainRule</span> <span class="s2">"str:("</span> <span class="s2">"msg:open parenthesis, probable sql/xss"</span> <span class="s2">"mz:ARGS|URL|BODY|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1010</span>;
+<span class="n">MainRule</span> <span class="s2">"str:)"</span> <span class="s2">"msg:close parenthesis, probable sql/xss"</span> <span class="s2">"mz:ARGS|URL|BODY|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1011</span>;
+<span class="n">MainRule</span> <span class="s2">"str:'"</span> <span class="s2">"msg:simple quote"</span> <span class="s2">"mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1013</span>;
+<span class="n">MainRule</span> <span class="s2">"str:,"</span> <span class="s2">"msg:comma"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1015</span>;
+<span class="n">MainRule</span> <span class="s2">"str:#"</span> <span class="s2">"msg:mysql comment (#)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1016</span>;
+<span class="n">MainRule</span> <span class="s2">"str:@@"</span> <span class="s2">"msg:double arobase (@@)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1017</span>;
+</code></pre></div></div>
+
+<h2 id="五naxsi-規則與攔截分數介紹">五、Naxsi 規則與攔截分數介紹</h2>
+<h3 id="1-規則解說與計分方式">1. 規則解說與計分方式</h3>
+
+<blockquote class="prompt-info">
+  <p>這是 <code class="language-plaintext highlighter-rouge">naxsi_core.rules</code> 內的部份規則。</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>規則</th>
+      <th>規則解說</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>id 為 1001 的規則</td>
+      <td>
+<code class="language-plaintext highlighter-rouge">MainRule "str:\"" "msg:double quote" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:8,$XSS:8" id:1001;</code> <br> 表示如果在請求體(BODY)，統一資源定位符(URL)，請求參數(ARGS)，請求標題(Cookie)任何地方出現了雙引號(“)，就表示該請求可能是 SQL 注入或是 XSS 攻擊，判斷分數皆為 8。</td>
+    </tr>
+    <tr>
+      <td>id 為 1002 的規則表示</td>
+      <td>
+<code class="language-plaintext highlighter-rouge">MainRule "str:0x" "msg:0x, possible hex encoding" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:2" id:1002;</code> <br> 表示如果在請求體(BODY)，統一資源定位符(URL)，請求參數(ARGS)，請求標題(Cookie)任何地方出現了雙引號(“)，就表示該請求可能是 SQL 注入或是 XSS 攻擊，判斷分數皆為 2。</td>
+    </tr>
+    <tr>
+      <td>id 為 1013 的規則表示</td>
+      <td>
+<code class="language-plaintext highlighter-rouge">MainRule "str:'" "msg:simple quote" "mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie" "s:$SQL:4,$XSS:8" id:1013;</code> <br> 表示如果在請求體(BODY)，統一資源定位符(URL)，請求參數(ARGS)，請求標題(Cookie)任何地方出現了單引號(’)，就表示該請求可能是 SQL 注入或是 XSS 攻擊，判斷分數為 4 跟 8。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="2-攔截分數建立網站防護規則">2. 攔截分數（建立網站防護規則）</h3>
+
+<blockquote class="prompt-info">
+  <p>這是在 <code class="language-plaintext highlighter-rouge">nginx.conf</code> 內的設定，最終分數可以自訂，一旦累積的分數到達設定的標準，就會攔截並回報錯誤，詳細設定方式底下介紹。</p>
+</blockquote>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 設定 Naxsi 何時行動，可自行調整阻擋的分數，當請求達到此分數時，請求將被拒絕
+# 以下設定為當分數累積到到 8 (或 4)後就阻擋
+</span>
+<span class="n">CheckRule</span> <span class="s2">"$SQL &gt;= 8"</span> <span class="n">BLOCK</span>;  
+<span class="n">CheckRule</span> <span class="s2">"$RFI &gt;= 8"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$TRAVERSAL &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$UPLOAD &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$XSS &gt;= 8"</span> <span class="n">BLOCK</span>;
+</code></pre></div></div>
+
+<h2 id="六安裝-naxsi-模組">六、安裝 Naxsi 模組</h2>
+
+<h3 id="1-安裝必要套件">1. 安裝必要套件</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum groupinstall <span class="s2">"development tools"</span> <span class="nt">-y</span>
+</code></pre></div></div>
+
+<h3 id="2-安裝-pcre-以及-openssl-套件">2. 安裝 PCRE 以及 openssl 套件</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>pcre pcre-devel openssl openssl-devel <span class="nt">-y</span>
+</code></pre></div></div>
+
+<h3 id="3-在想要的路徑下載-naxsi">3. 在想要的路徑下載 Naxsi</h3>
+<p>我是安裝在 <code class="language-plaintext highlighter-rouge">/usr/local/nginx_module</code> 內。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/nbs-system/naxsi.git
+</code></pre></div></div>
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/1.jpg" alt=""></p>
+
+<h3 id="4-路徑整理">4. 路徑整理</h3>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>從 <span class="n">Github</span> 下載的 <span class="n">Naxsi</span> 位置
+/<span class="n">usr</span>/<span class="n">local</span>/<span class="n">naxsi</span>
+
+<span class="n">naxsi</span>主要資料夾
+/<span class="n">usr</span>/<span class="n">local</span>/<span class="n">naxsi</span>/<span class="n">naxsi_src</span>
+
+<span class="n">naxsi</span> 規則檔
+/<span class="n">usr</span>/<span class="n">local</span>/<span class="n">naxsi</span>/<span class="n">naxsi_config</span>/<span class="n">naxsi_core</span>.<span class="n">rules</span>
+</code></pre></div></div>
+
+<h3 id="5-編譯-nginx">5. 編譯 Nginx</h3>
+<p>要在有 configure 的那個資料夾底下編譯，模組安裝路徑可以用絕對路徑比較保險，
+使用 <code class="language-plaintext highlighter-rouge">--add-dynamic-module</code> 把 Naxsi 加進去。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./configure <span class="nt">--user</span><span class="o">=</span>www <span class="nt">--group</span><span class="o">=</span>www <span class="se">\</span>
+ <span class="nt">--prefix</span><span class="o">=</span>/usr/local/nginx <span class="se">\</span>
+ <span class="nt">--with-http_stub_status_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_ssl_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_v2_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_gzip_static_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_sub_module</span> <span class="se">\</span>
+ <span class="nt">--with-stream</span> <span class="se">\</span>
+ <span class="nt">--with-stream_ssl_module</span> <span class="se">\</span>
+ <span class="nt">--with-openssl</span><span class="o">=</span>/root/lnmp1.6/src/openssl-1.1.1d <span class="se">\</span>
+ <span class="nt">--with-openssl-opt</span><span class="o">=</span>enable-weak-ssl-ciphers <span class="se">\</span>
+ <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/ngx_http_geoip2_module <span class="se">\</span>
+ <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/naxsi/naxsi_src
+
+<span class="nv">$ </span>make 
+
+<span class="c"># 有些人說不要 make install，但我用 make module 或純粹 make 都沒有用，不知道原因</span>
+<span class="nv">$ </span>make <span class="nb">install</span>
+</code></pre></div></div>
+
+<p>編譯成功後長這樣：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nginx <span class="nt">-V</span>
+
+nginx version: nginx/1.16.1
+built by gcc 4.8.5 20150623 <span class="o">(</span>Red Hat 4.8.5-44<span class="o">)</span> <span class="o">(</span>GCC<span class="o">)</span>
+built with OpenSSL 1.1.1d  10 Sep 2019
+TLS SNI support enabled
+configure arguments: <span class="nt">--user</span><span class="o">=</span>www <span class="nt">--group</span><span class="o">=</span>www <span class="nt">--prefix</span><span class="o">=</span>/usr/local/nginx <span class="nt">--with-http_stub_status_module</span> <span class="nt">--with-http_ssl_module</span> <span class="nt">--with-http_v2_module</span> <span class="nt">--with-http_gzip_static_module</span> <span class="nt">--with-http_sub_module</span> <span class="nt">--with-stream</span> <span class="nt">--with-stream_ssl_module</span> <span class="nt">--with-openssl</span><span class="o">=</span>/root/lnmp1.6/src/openssl-1.1.1d <span class="nt">--with-openssl-opt</span><span class="o">=</span>enable-weak-ssl-ciphers <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/ngx_http_geoip2_module <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/naxsi/naxsi_src
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/2.jpg" alt=""></p>
+
+<h3 id="6-將-naxsi-主要設定檔複製進-nginx-資料夾中">6. 將 Naxsi 主要設定檔複製進 Nginx 資料夾中</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp</span> /usr/local/nginx_module/naxsi/naxsi_config/naxsi_core.rules  /usr/local/nginx/conf
+</code></pre></div></div>
+
+<h3 id="7-新增一個-naxsi-規則檔案">7. 新增一個 Naxsi 規則檔案</h3>
+
+<p>這是上面攔截分數把他包成一個檔案 <code class="language-plaintext highlighter-rouge">naxsi_custom.rules</code>，到時候再 include 到 nginx.conf 裡面。</p>
+
+<blockquote class="prompt-info">
+  <p>底下設定在上面第 2 節有介紹。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/naxsi_custom.rules
+</code></pre></div></div>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 開啟 naxsi
+</span><span class="n">SecRulesEnabled</span>;
+
+<span class="c"># 學習模式 預設關閉
+#LearningMode; 
+</span>
+<span class="c"># 透過 libinjection 判斷 SQL 注入和 XSS 攻擊
+</span><span class="n">LibInjectionSql</span>;
+<span class="n">LibInjectionXss</span>;
+
+<span class="c"># 拒絕訪問時展示的頁面 
+</span><span class="n">DeniedUrl</span> <span class="s2">"/RequestDenied"</span>;  
+
+<span class="c"># 設定 Naxsi 何時行動，可自行調整阻擋的分數，當請求達到此分數時，請求將被拒絕
+# 以下設定為當分數累積到到 8 (或 4)後就阻擋
+</span><span class="n">CheckRule</span> <span class="s2">"$SQL &gt;= 8"</span> <span class="n">BLOCK</span>;  
+<span class="n">CheckRule</span> <span class="s2">"$RFI &gt;= 8"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$TRAVERSAL &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$UPLOAD &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$XSS &gt;= 8"</span> <span class="n">BLOCK</span>;
+
+<span class="c"># Naxsi 的 log 位置設定
+</span><span class="n">error_log</span> /<span class="n">home</span>/<span class="n">wwwlogs</span>/<span class="n">naxsi_attach</span>.<span class="n">log</span>;
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/3.jpg" alt=""></p>
+
+<h3 id="8-開始設定">8. 開始設定</h3>
+<h4 id="1-nginxconf">(1) nginx.conf</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/nginx.conf
+</code></pre></div></div>
+
+<p>裡面設定：</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在全區塊 pid 下面新增這句：
+</span><span class="n">load_module</span> <span class="n">modules</span>/<span class="n">ngx_http_naxsi_module</span>.<span class="n">so</span>;
+
+<span class="c"># 在 http include rules
+</span><span class="n">http</span>
+  {
+    <span class="n">include</span> /<span class="n">usr</span>/<span class="n">local</span>/<span class="n">nginx</span>/<span class="n">conf</span>/<span class="n">naxsi_core</span>.<span class="n">rules</span>;
+  }
+
+
+<span class="c"># 在 server include rules
+</span><span class="n">server</span> 
+  {
+  <span class="n">location</span> /
+      {
+        <span class="n">include</span> /<span class="n">usr</span>/<span class="n">local</span>/<span class="n">nginx</span>/<span class="n">conf</span>/<span class="n">naxsi_custom</span>.<span class="n">rules</span>;
+      }
+
+  <span class="n">location</span> /<span class="n">RequestDenied</span>  <span class="c"># 要搭配上面的 DeniedUrl "/RequestDenied";
+</span>      {
+        <span class="n">return</span> <span class="m">400</span>; <span class="c"># 被阻擋後顯示錯誤 400
+</span>      }
+  }
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/4.jpg" alt="">
+<img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/5.jpg" alt=""></p>
+
+<h4 id="2-vhostconf">(2) vhost.conf</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/vhost/xxx.conf
+</code></pre></div></div>
+
+<p>裡面設定：</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">server</span> 
+  {
+  <span class="n">location</span> /
+      {
+        <span class="n">include</span> /<span class="n">usr</span>/<span class="n">local</span>/<span class="n">nginx</span>/<span class="n">conf</span>/<span class="n">naxsi_custom</span>.<span class="n">rules</span>;
+      }
+
+  <span class="n">location</span> /<span class="n">RequestDenied</span>  <span class="c"># 要搭配上面的 DeniedUrl "/RequestDenied";
+</span>      {
+        <span class="n">return</span> <span class="m">400</span>; <span class="c"># 被阻擋後顯示錯誤 400
+</span>      }
+  }
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/6.jpg" alt=""></p>
+
+<h3 id="9-重新啟動或重新讀取-nginx">9. 重新啟動或重新讀取 Nginx</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 重新啟動 nginx</span>
+<span class="nv">$ </span>nginx <span class="nt">-s</span> reopen
+
+<span class="c"># 重新讀取 nginx</span>
+<span class="nv">$ </span>nginx <span class="nt">-s</span> reload
+</code></pre></div></div>
+<h2 id="七實際測試">七、實際測試</h2>
+<h3 id="1-瀏覽器上測試">1. 瀏覽器上測試</h3>
+<p>在有設定 Naxsi 的網站上面打這些 SQL 注入的請求：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://url/=&lt;&gt;
+http://url/?a=&lt;&gt;
+http://localhost/?...&lt;&gt;
+http://localhost/?id=&lt;&gt;
+</code></pre></div></div>
+<h3 id="2-主機上測試">2. 主機上測試</h3>
+<p>在終端機上面存取有設定 Naxsi 的網站：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-IL</span> <span class="s2">"http://x.x.x.x/?a=&lt;&gt;"</span>
+<span class="nv">$ </span>wget <span class="s2">"https://xxx.xxx.com/?&lt;&gt;"</span>
+</code></pre></div></div>
+
+<h2 id="八攔截成功畫面與分析">八、攔截成功畫面與分析</h2>
+
+<h3 id="1-當下攔截畫面">1. 當下攔截畫面</h3>
+<p>觀察網站收到 SQL 注入的請求後有沒有報400。</p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/7.jpg" alt=""></p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/8.jpg" alt=""></p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/9.jpg" alt=""></p>
+
+<h3 id="2-攔截-log-查看">2. 攔截 log 查看</h3>
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/10.jpg" alt=""></p>
+
+<h3 id="3-log-分析">3. log 分析</h3>
+
+<p>查看設定的 <code class="language-plaintext highlighter-rouge">naxsi_attach.log</code>，若在 log 中出現 NAXSI_FMT 開頭，就是啟用成功。  <br>
+挑 2022/10/20 17:53:37 那行 log 來當範例（IP 跟網址有改過）。</p>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">2022</span>/<span class="m">10</span>/<span class="m">20</span> <span class="m">17</span>:<span class="m">53</span>:<span class="m">37</span> [<span class="n">error</span>] <span class="m">7275</span><span class="c">#0: *5428 NAXSI_FMT: ip=223.58.42.103&amp;server=taipei.test.com&amp;uri=/=a&lt;&gt;&amp;vers=1.3&amp;total_processed=20&amp;total_blocked=3&amp;config=block&amp;cscore0=$XSS&amp;score0=8&amp;zone0=URL&amp;id0=1302&amp;var_name0=, client: 223.58.42.103, server: taipei.test.com, request: "GET /=a%3C%3E HTTP/2.0", host: "taipei.test.com"
+</span></code></pre></div></div>
+
+<p>且對應到的規則是以下兩行：</p>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">########################################
+## Cross Site Scripting IDs:1300-1399 ##
+########################################
+</span><span class="n">MainRule</span> <span class="s2">"str:&lt;"</span> <span class="s2">"msg:html open tag"</span> <span class="s2">"mz:ARGS|URL|BODY|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$XSS:8"</span> <span class="n">id</span>:<span class="m">1302</span>;
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>log</th>
+      <th>log 分析</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NAXSI_FMT</td>
+      <td style="text-align: right">2022/10/20 17:53:37 [error] 7275#0: *5428 NAXSI_FMT</td>
+    </tr>
+    <tr>
+      <td>對方IP</td>
+      <td>ip=223.58.42.103&amp;</td>
+    </tr>
+    <tr>
+      <td>請求的主機名　</td>
+      <td>server=taipei.test.com&amp;</td>
+    </tr>
+    <tr>
+      <td>uri</td>
+      <td>uri=/=a&lt;&gt;&amp;</td>
+    </tr>
+    <tr>
+      <td>Naxsi 版本　</td>
+      <td>vers=1.3&amp;</td>
+    </tr>
+    <tr>
+      <td>總共請求 20 次　</td>
+      <td>total_processed=20&amp;</td>
+    </tr>
+    <tr>
+      <td>總共阻擋 3 次　</td>
+      <td>total_blocked=3&amp;</td>
+    </tr>
+    <tr>
+      <td>設定：攔截　</td>
+      <td>config=block&amp;</td>
+    </tr>
+    <tr>
+      <td>分數標籤：XSS　</td>
+      <td>cscore1=$XSS&amp;</td>
+    </tr>
+    <tr>
+      <td>XSS分數</td>
+      <td>score1=8&amp;</td>
+    </tr>
+    <tr>
+      <td>符合的區域　</td>
+      <td>zone0=URL&amp;</td>
+    </tr>
+    <tr>
+      <td>符合的規則 id　</td>
+      <td>id0=1302&amp;</td>
+    </tr>
+    <tr>
+      <td>符合的變數</td>
+      <td>var_name0= ,</td>
+    </tr>
+    <tr>
+      <td>對方 IP</td>
+      <td>client: 223.58.42.103,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>server=taipei.test.com,</td>
+    </tr>
+    <tr>
+      <td>請求內容</td>
+      <td>request: “GET /=a%3C%3E HTTP/2.0”,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>host: “taipei.test.com”</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="九額外開啟-naxsi_exlog">九、(額外)開啟 NAXSI_EXLOG</h2>
+<p>開啟 NAXSI_EXLOG，可以記錄具體觸發 Naxsi 攔截規則的請求內容，內容紀錄正常和異常的請求，方便後續分析攔截的是攻擊請求還是誤判。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>log</th>
+      <th>log 分析</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NAXSI_FMT（原本就有）</td>
+      <td>僅包含 ID 和異常的位置</td>
+    </tr>
+    <tr>
+      <td>NAXSI_EXLOG</td>
+      <td>提供了實際的內容，可以輕鬆確認它是否為誤報</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="1-naxsi_exlog-設定">1. NAXSI_EXLOG 設定</h3>
+
+<p>在 conf 檔裡的 server 部分新增設定：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/vhost/xxx.conf
+
+<span class="nv">$ </span>vim /usr/local/nginx/conf/nginx.conf
+</code></pre></div></div>
+
+<p>裡面設定：</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">server</span> 
+  {
+    <span class="n">set</span> $<span class="n">naxsi_extensive_log</span> <span class="m">1</span>;  
+  }
+</code></pre></div></div>
+
+<h3 id="2-naxsi_exlog-的-log-畫面">2. NAXSI_EXLOG 的 log 畫面</h3>
+<p>會多出現一個 NAXSI_EXLOG，就表示開啟成功。</p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/11.jpg" alt=""></p>
+
+<h2 id="十額外將-naxsi-加入-fail2ban">十、(額外)將 Naxsi 加入 Fail2ban</h2>
+<h3 id="1-fail2ban-新增-naxsi-過濾器">1. Fail2ban 新增 Naxsi 過濾器</h3>
+<p>filter 的 conf 名稱可以自訂。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/fail2ban/filter.d/nginx-naxsi.conf
+</code></pre></div></div>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">INCLUDES</span>]
+<span class="n">before</span> = <span class="n">common</span>.<span class="n">conf</span>
+
+[<span class="n">Definition</span>]
+<span class="n">failregex</span> = <span class="n">NAXSI_FMT</span>: <span class="n">ip</span>=&lt;<span class="n">HOST</span>&gt;&amp;<span class="n">server</span>=.*&amp;<span class="n">uri</span>=.*&amp;<span class="n">learning</span>=<span class="m">0</span>
+            <span class="n">NAXSI_FMT</span>: <span class="n">ip</span>=&lt;<span class="n">HOST</span>&gt;.*&amp;<span class="n">config</span>=<span class="n">block</span>
+<span class="n">ignoreregex</span> = <span class="n">NAXSI_FMT</span>: <span class="n">ip</span>=&lt;<span class="n">HOST</span>&gt;.*&amp;<span class="n">config</span>=<span class="n">learning</span>
+</code></pre></div></div>
+
+<h3 id="2-fail2ban-主要設定檔設定">2. Fail2ban 主要設定檔設定</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/fail2ban/jail.local
+</code></pre></div></div>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">nginx</span>-<span class="n">naxsi</span>]
+<span class="n">enabled</span> = <span class="n">true</span>
+<span class="n">filter</span> = <span class="n">nginx</span>-<span class="n">naxsi</span>
+<span class="n">action</span> = <span class="n">iptables</span>-<span class="n">multiport</span>[<span class="n">name</span>=<span class="n">nginx</span>-<span class="n">naxsi</span>, <span class="n">port</span>=<span class="s2">"http,https"</span>, <span class="n">protocol</span>=<span class="n">tcp</span>]
+<span class="n">logpath</span> = /<span class="n">home</span>/<span class="n">wwwlogs</span>/<span class="n">naxsi_attach</span>.<span class="n">log</span>
+<span class="n">maxretry</span> = <span class="m">6</span>
+<span class="n">bantime</span> = -<span class="m">1</span> <span class="c"># 封鎖一輩子！
+</span></code></pre></div></div>
+
+<h2 id="十一額外白名單">十一、(額外)白名單</h2>
+<p>Naxsi 社區提供一些常用的白名單規則，例如:wordpress。</p>
+
+<p><a href="https://github.com/nbs-system/naxsi-rules" title="naxsi-rules  Github">naxsi-rules Github</a></p>
+
+<p>然後將規則 include 到 server 內的 location，重啟 nginx 即可，</p>
+
+<p>不過要注意一些這些白名單的修改日期，有些太老。</p>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://github.com/nbs-system/naxsi">Naxsi Github</a></li>
+  <li><a href="https://blog.cloudmax.com.tw/waf/">WAF 是什麼？你的網站需要 WAF 嗎？</a></li>
+  <li><a href="https://github.com/nbs-system/naxsi-rules">naxsi-rules Github</a></li>
+  <li><a href="https://bolerolily.github.io/2018/08/21/Naxsi-%E9%85%8D%E7%BD%AE%E7%99%BD%E5%90%8D%E5%8D%95/">Naxsi 配置白名單</a></li>
+  <li><a href="https://dotblogs.com.tw/eric_obay_talk/2018/10/22/150521">Nginx 搭配 Naxsi 實現 WAF 功能</a></li>
+  <li><a href="https://ithelp.ithome.com.tw/articles/10217411">Nginx naxsi + 色情守門員</a></li>
+  <li><a href="https://medium.com/@icarobichir/install-and-configure-nginx-with-naxsi-9aaa66f20d4e">Install and Configure Nginx With Naxsi</a></li>
+  <li><a href="https://www.securitypaper.org/5.%E9%99%84%E5%BD%95/04.naxsi%E5%AE%89%E8%A3%85%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%AE%80%E4%BB%8B/">NAXSI安裝測試與簡介</a></li>
+  <li><a href="https://enterprise.fetnet.net/content/ebu/tw/epaper/tech/27th/FETnet-WAF-Firewall.html">沒 WAF 防火牆還想混網路？ WAF 防火牆非裝不可的 3 個原因</a></li>
+</ul>
+
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/review/2022/08/22/Book-review-3-26.html" title="閱讀心得(3)：在意別人而受傷，怎麼找回快樂">
+          <div>閱讀心得(3)：在意別人而受傷，怎麼找回快樂</div>
+        </a><a class="next" href="/review/2022/11/29/Book-review-4-28.html" title="閱讀心得(4)：強大內心的自我對話習慣">
+          <div>閱讀心得(4)：強大內心的自我對話習慣</div>
+        </a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li class="">
+          <a class="post-link" href="/example/2017/12/04/plantuml-example.html" title="Plantuml example">
+            Plantuml example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/linux/2022/03/23/What-is-rootkit-and-Centos-7-use-rkhunter-11.html" title="用 rkhunter 把 rootkit 通通抓起來！">
+            用 rkhunter 把 rootkit 通通抓起來！<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/markdown/2016/01/01/another-test-markdown.html" title="Another test markdown">
+            Another test markdown<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/markdown/2018/05/26/mathjax-test.html" title="Mathjax Test">
+            Mathjax Test<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

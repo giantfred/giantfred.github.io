@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>各種自製 Docker Image 的方法 | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="各種自製 Docker Image 的方法">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Dockerfile 像在寫腳本耶。">
+<meta property="og:description" content="Dockerfile 像在寫腳本耶。">
+<link rel="canonical" href="http://localhost:4000/docker/2022/06/16/Create-docker-image-21.html">
+<meta property="og:url" content="http://localhost:4000/docker/2022/06/16/Create-docker-image-21.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-06-16T00:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="各種自製 Docker Image 的方法">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GiantFred"},"dateModified":"2022-06-16T00:00:00+08:00","datePublished":"2022-06-16T00:00:00+08:00","description":"Dockerfile 像在寫腳本耶。","headline":"各種自製 Docker Image 的方法","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/docker/2022/06/16/Create-docker-image-21.html"},"url":"http://localhost:4000/docker/2022/06/16/Create-docker-image-21.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">各種自製 Docker Image 的方法</h1>
+  <h2 class="post-subtitle"></h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2022-06-16T00:00:00+08:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Jun 16, 2022
+    </time>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 9 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/tags.html#centos">#centos</a><a class="post-tag" href="/tags.html#docker">#docker</a><a class="post-tag" href="/tags.html#container">#container</a>
+</div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>Docker 1.13.1</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一從運行中的-container-產生-image-檔">一、從運行中的 Container 產生 Image 檔</h2>
+<blockquote class="prompt-warning">
+  <p>注意事項：<br>
+(1) 執行 <code class="language-plaintext highlighter-rouge">docker commit</code> 時，Container 的狀態是可以停止中的。  <br>
+(2) 掛載在 Container 的儲存空間不會被存到新產生的 Image 的，需要在 <code class="language-plaintext highlighter-rouge">docker run</code> 時再用 -v 掛載。</p>
+</blockquote>
+
+<p>先找一個接近自己需要的 Docker Image 來當基底並 <code class="language-plaintext highlighter-rouge">docker run</code> 起來，並用 <code class="language-plaintext highlighter-rouge">docker exec</code> 進入這個 Container 來安裝和設定，再用 <code class="language-plaintext highlighter-rouge">docker commit</code> 把啟動後產生的變動寫到原來所使用的 Docker Image。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 從運行中的 Container 產生 image 檔</span>
+<span class="nv">$ </span>docker commit &lt;Container 名稱或 ID&gt; &lt;產出的 Docker Image 名稱&gt;
+
+<span class="c"># 透過 -m 來增加說明文字，-a 加上作者資訊</span>
+<span class="nv">$ </span>docker commit <span class="nt">-m</span> <span class="s2">"註解"</span> <span class="nt">-a</span> <span class="s2">"作者"</span> &lt;Container 名稱或 ID&gt; &lt;產出的 Docker Image 名稱&gt;
+
+<span class="c"># 製作一個把 Nginx 預設首頁的訊息從 Welcome 改成 Hello Nginx 的新 Docker Image</span>
+<span class="nv">$ </span>docker pull nginx
+<span class="nv">$ </span>docker run <span class="nt">--name</span> nginx-welcome <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+<span class="nv">$ </span>docker <span class="nb">cp </span>index.html nginx-welcome:/usr/share/nginx/html
+<span class="nv">$ </span>docker commit nginx-welcome nginx-hello-commit
+<span class="nv">$ </span>docker stop nginx-welcome
+<span class="nv">$ </span>docker images
+</code></pre></div></div>
+
+<p>使用 <code class="language-plaintext highlighter-rouge">docker images</code> 就可以看到剛剛 commit 出來的 image 檔。<br>
+<img src="/assets/images/2022-06-16-Create-Docker-image-21/1.jpg" alt=""></p>
+
+<p>再來執行剛剛 commit 出來的 docker-hello-commit，成功！    <br>
+<img src="/assets/images/2022-06-16-Create-Docker-image-21/2.jpg" alt=""></p>
+
+<h2 id="二用-bulid-指令自動化產生新的-image">二、用 Bulid 指令自動化產生新的 Image</h2>
+<blockquote class="prompt-info">
+  <p>Dockerfile 的檔案名稱有大小寫的分別。</p>
+</blockquote>
+
+<p>透過 <code class="language-plaintext highlighter-rouge">docker build</code> 和 Dockerfile 就可以以全自動的方式來產生 Image 檔，<br>
+Dockerfile 可以看成是一個腳本，用來明確告訴 <code class="language-plaintext highlighter-rouge">docker build</code> 產生新 Image 所需要用到的資訊和步驟。</p>
+
+<p>如果一切都順利，在執行結束後會看到 <code class="language-plaintext highlighter-rouge">Successfully built XXXXX</code>，表示已經成功建立！<br>
+<code class="language-plaintext highlighter-rouge">docker build</code> 執行完成後，用 <code class="language-plaintext highlighter-rouge">docker images</code> 查詢，可以看到剛剛建立的 Image。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 自動化產生新的 Image</span>
+<span class="nv">$ </span>docker build <span class="nt">-t</span>  &lt;新產生的 Image 的名稱：版本&gt; &lt;Dockfile 所在的檔案路徑或網址&gt;
+
+<span class="nv">$ </span><span class="nb">cd </span>nginx-docker
+<span class="nv">$ </span>docker build <span class="nt">-t</span> nginx-ayu:demo <span class="nb">.</span>
+<span class="nv">$ </span>docker build <span class="nt">-t</span> nginx-ayu:demo http://xxx.xxxx.xxx.xxx
+</code></pre></div></div>
+
+<h2 id="三dockerfile常用的指令和格式">三、Dockerfile常用的指令和格式</h2>
+<h3 id="1-from">1. FROM</h3>
+<p><strong>用途：指定要下載的 Image 檔名稱。</strong></p>
+
+<p>從 Docker Hub 下載 Debain 的 Jessie 版本的 Image 檔。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FROM debain:jessie
+</code></pre></div></div>
+
+<h3 id="2-env">2. ENV</h3>
+<p><strong>用途：設定環境變數。</strong></p>
+
+<p>在 Container 裡設定指定 Nginx 的 <code class="language-plaintext highlighter-rouge">NGINX_VERSION</code> 環境變數。</p>
+
+<p>之後執行 <code class="language-plaintext highlighter-rouge">apt-get install</code> 安裝指令時，會需要這個 <code class="language-plaintext highlighter-rouge">ENV</code> 所設定的變數，<br>
+通常會把經常變動的參數設成環境變數，以便後續維護或更新時，可以不用直接修改相關的指令。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ENV NGINX_VERSION 1.11.10-1~jessie
+</code></pre></div></div>
+
+<h3 id="3-expose">3. EXPOSE</h3>
+<p><strong>用途：指定 Container 啟用的連結埠號。</strong></p>
+
+<p>設定這個 Container 要啟用 80 和 443  port，透過 <code class="language-plaintext highlighter-rouge">EXPOSE</code> 啟用的連結埠不能被外部或主機連線存取，必須透過 <code class="language-plaintext highlighter-rouge">docker run</code> 的 <code class="language-plaintext highlighter-rouge">-p</code> 選項設定，主機的連線或程式才可以透過該對應的主機連結埠進行連結及存取。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>EXPOSE 80 443
+</code></pre></div></div>
+
+<h3 id="4-run">4. RUN</h3>
+<p><strong>用途：建立 Image 時執行的指令，只有在 <code class="language-plaintext highlighter-rouge">docker build</code> 產生的時候會有作用，大部分被用在設置和安裝軟體。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 利用 RUN 指令在這個暫時啟用的 Container 執行安裝的指令</span>
+RUN apt-key adv <span class="nt">--keyserver</span> ........
+</code></pre></div></div>
+
+<h3 id="5-cmd">5. CMD</h3>
+<p><strong>用途：Container 啟動完成後要執行的指令。</strong></p>
+
+<blockquote class="prompt-warning">
+  <p>注意！每個 Dockerfile 只能有一個 <code class="language-plaintext highlighter-rouge">CMD</code> 指令會有作用，若同一個 Dockfile 裡有多個 <code class="language-plaintext highlighter-rouge">CMD</code> 指令，只有 <strong>最後一個</strong> <code class="language-plaintext highlighter-rouge">CMD</code> 指令會有作用。</p>
+</blockquote>
+
+<p>(1)（官方建議寫法）<br>
+可用在 Dockfile 裡，但不會使用預設的 Shell 執行，不能使用 Shell 所提供的功能，像是取用環境變數或用 Shell 內建的指令。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CMD <span class="o">[</span><span class="s2">"&lt;要執行的程式&gt;"</span>,<span class="s2">"&lt;要執行的程式用到的第一組選項&gt;"</span>,<span class="s2">"&lt;要執行的程式用到的第二組選項或第一組選的參數值&gt;"</span><span class="o">]</span>
+</code></pre></div></div>
+
+<p>(2) 可用在 Dockfile 裡，會使用預設的 Shell 執行。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CMD &lt;要執行的程式&gt; &lt;要執行的程式用到的第一組選項&gt; &lt;要執行的程式用到的第二組選項或第一組選的參數值&gt;
+</code></pre></div></div>
+
+<p>(3) 搭配 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 指令使用，傳遞指令選項給 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 指令使用。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CMD <span class="o">[</span><span class="s2">"&lt;加在 ENTRYPOINT 執行程式的選項一&gt;"</span>,<span class="s2">"&lt;加在 ENTRYPOINT 執行程式的選項二&gt;"</span><span class="o">]</span>
+</code></pre></div></div>
+
+<p>當 Container 啟動完成後，要求 Container 啟動 Nginx，就等於在 Container 命令列執行 <code class="language-plaintext highlighter-rouge">$ nginx -g daemon off</code>。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CMD <span class="o">[</span><span class="s2">"nginx"</span>, <span class="s2">"-g"</span>, <span class="s2">"daemon off;"</span><span class="o">]</span>     
+
+<span class="c"># daemon off 是 -g 選項的參數，且要求須使用雙引號  </span>
+CMD nginx <span class="nt">-g</span>, <span class="s2">"daemon off;"</span>   
+</code></pre></div></div>
+
+<h3 id="6-entrypoint">6. ENTRYPOINT</h3>
+<p><strong>用途：用法和 <code class="language-plaintext highlighter-rouge">CMD</code> 相似，都是用來設定 Container 啟動後要執行的指令，但如果是用 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 指令來啟動程式的話，就不能在 <code class="language-plaintext highlighter-rouge">docker run</code> 後面加入執行指令來蓋掉 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 所要求的啟動方式，反而會變成 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 的後續選項。</strong></p>
+
+<p>(1) 官方建議寫法</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ENTRYPOINT <span class="o">[</span><span class="s2">"&lt;要執行的程式&gt;"</span>,<span class="s2">"&lt;要執行的程式用到的第一組選項&gt;"</span>,<span class="s2">"&lt;要執行的程式用到的第二組選項或第一組選的參數值&gt;"</span><span class="o">]</span>
+</code></pre></div></div>
+
+<p>(2)</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ENTRYPOINT &lt;要執行的程式&gt; &lt;要執行的程式用到的第一組選項&gt; &lt;要執行的程式用到的第二組選項&gt;
+</code></pre></div></div>
+
+<p>假如有個 Dockfile 最後一行從 <code class="language-plaintext highlighter-rouge">CMD</code> 改成 <code class="language-plaintext highlighter-rouge">ENTRYPOINT ["nginx", "-g", "daemon off;"]</code> 後產生新的 Image 檔，就會發生錯誤，因為 <code class="language-plaintext highlighter-rouge">/bin/bash</code> 會變成 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 的後續選項： <code class="language-plaintext highlighter-rouge">[nginx -g "daemon off;"/bin/bash]</code>，而 Nginx 沒有 <code class="language-plaintext highlighter-rouge">/bin/bash</code> 選項</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker build <span class="nt">-t</span>  nginx-entrypoint <span class="nb">.</span>
+<span class="nv">$ </span>docker run <span class="nt">-it</span> nginx-entrypoint /bin/bash
+發生錯誤！
+</code></pre></div></div>
+
+<h3 id="7-workdir">7. WORKDIR</h3>
+<p><strong>用途：指定執行指令的資料夾位置</strong></p>
+
+<blockquote class="prompt-warning">
+  <p>注意！當資料夾是相對路徑時，預設會以它上一個 <code class="language-plaintext highlighter-rouge">WORKDIR</code> 指令所指定的資料夾位置做為目前所在的資料夾位置。</p>
+</blockquote>
+
+<p>如果用到 <code class="language-plaintext highlighter-rouge">RUN</code>、<code class="language-plaintext highlighter-rouge">CMD</code>、<code class="language-plaintext highlighter-rouge">ENTRYPOINT</code>、<code class="language-plaintext highlighter-rouge">COPY</code>、<code class="language-plaintext highlighter-rouge">ADD</code> 指令，便會需要利用 <code class="language-plaintext highlighter-rouge">WORKDIR</code> 來進行資料夾位置轉換。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WORKDIR &lt;資料夾完整路徑或相對路徑&gt;
+</code></pre></div></div>
+
+<p>建立 /home/ayubiz/abc 資料夾後，利用 WORKDIR 切換到 /home/ayubiz 資料夾，然後把 hello.html 檔案複製到 /home/ayubiz 裡，透過 <code class="language-plaintext highlighter-rouge">WORKDIR</code> 指定相對位置 abc 資烙夾將位置切換進 /home/ayubiz/abc，同時這也是使用 <code class="language-plaintext highlighter-rouge">docekr exec</code> 進入新啟動的 Container 後的所在位置。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RUN <span class="nb">mkdir</span> <span class="nt">-p</span> /home/ayubiz/abc
+
+WORKDIR /home/ayubiz
+
+COPY hello.html ./
+
+WORKDIR abc
+</code></pre></div></div>
+
+<h3 id="8-add">8. ADD</h3>
+<blockquote class="prompt-info">
+  <p>需要解自動解壓縮(.tar)時適用。</p>
+</blockquote>
+
+<p><strong>用途：將一個或多個檔案放進 Image 裡，讓 Dockfile 所產生的 Image 檔能包含這些檔案。</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ADD &lt;來源檔案在主機的完整路徑和檔名&gt; &lt;Image 的完整目的路徑和檔名&gt;
+
+ADD &lt;來源檔案完整網址和檔名&gt; &lt;Image 的完整目的路徑和檔名&gt;
+
+ADD 指令支援 <span class="k">*</span> 和 ? 等符號的萬用字元
+</code></pre></div></div>
+
+<p>將 Dockfile 所在目錄下的 hello.html 檔案加到新產生的 Image 檔的 /usr/share/nginx/html 資料夾。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ADD hello.html /usr/share/nginx/html
+
+ADD <span class="k">*</span>.html /usr/share/nginx/html
+
+ADD hello.htm? /usr/share/nginx/html
+</code></pre></div></div>
+<blockquote class="prompt-warning">
+  <p>注意！如果在路徑最後加上 / ，都會被認為是一個資料夾位置而不是檔案，若檔案來源路徑是資料夾，資料夾內的檔案會被加到 Image 檔案中，但資料夾本身不會被加入。<br>
+也就是說 <code class="language-plaintext highlighter-rouge">docker build</code> 不會自動在 Image 檔案裡新增來源檔案的資料夾後再加入來源資料夾內的檔案，但是當目的地檔案是資料夾時，<code class="language-plaintext highlighter-rouge">docker build</code> 會自動建立不存在的資料夾。<br>
+例如：ADD ./abc/ /demo/<br>
+<code class="language-plaintext highlighter-rouge">docker build</code> 會新增 demo 資料夾，然後將 abc 資料夾底下的所有檔案加到 demo 資料夾裡，但是 demo 資料夾裡不會有 abc 資料夾的存在。</p>
+</blockquote>
+
+<h3 id="9-copy">9. COPY</h3>
+<p><strong>用途：功能跟 <code class="language-plaintext highlighter-rouge">ADD</code> 類似，如果沒有要自動解壓縮檔案，官方還是比較建議用<code class="language-plaintext highlighter-rouge">COPY</code>。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>COPY &lt;來源檔案在主機的完整路徑和檔名&gt; &lt;Container 裡的完整目的路徑和檔名&gt;
+</code></pre></div></div>
+
+<h3 id="10-maintainer">10. MAINTAINER</h3>
+<p><strong>用途：標註此 Dockerfile 的作者或維護者</strong></p>
+
+<blockquote class="prompt-danger">
+  <p>此指令要被淘汰，建議之後用 LABEL 指令。</p>
+</blockquote>
+
+<p>如果要把 Dockfile 分享出去，建議寫上電子郵件。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MAINTAINER NGINX Docker Maintainers <span class="s2">"docker-maint@nginx.com"</span>
+</code></pre></div></div>
+<h3 id="11-label">11. LABEL</h3>
+<p><strong>用途：將 Image 檔的作者、版本、描述、其他自訂資訊儲存到新產生的 Image 檔，建議將多欄位與值都使用一個 <code class="language-plaintext highlighter-rouge">LABEL</code> 來執行。</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LABEL &lt;欄位名稱&gt;<span class="o">=</span><span class="s2">"&lt;欄位值&gt;"</span> &lt;欄位名稱&gt;<span class="o">=</span><span class="s2">"&lt;欄位值&gt;"</span> &lt;欄位名稱&gt;<span class="o">=</span><span class="s2">"&lt;欄位值&gt;"</span> 
+
+LABEL <span class="nv">version</span><span class="o">=</span><span class="s2">"0.1"</span> <span class="nv">description</span><span class="o">=</span><span class="s2">"demo"</span> <span class="nv">organization</span><span class="o">=</span><span class="s2">"arthurtoday.com"</span>
+</code></pre></div></div>
+
+<p>存入的資訊可以透過 <code class="language-plaintext highlighter-rouge">docker image inspect</code> 查看 Labels 欄位。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspect <span class="nt">-f</span> <span class="s1">'{{json .ContainerConfig.Labels}}'</span> &lt;Image 名稱或 ID&gt;
+</code></pre></div></div>
+
+<h3 id="12-user">12. USER</h3>
+<p><strong>用途：指定新產生的 Image 檔的預設使用者帳號（通常都是 root），要先用 <code class="language-plaintext highlighter-rouge">RUN</code> 建立新使用者，<code class="language-plaintext highlighter-rouge">USER</code> 指令不會自動建立新帳號，如果指定不存在的使用者帳號是不會有作用的。</strong></p>
+
+<p>使用者帳號會影響到 <code class="language-plaintext highlighter-rouge">RUN</code>、<code class="language-plaintext highlighter-rouge">CMD</code>、<code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 等指令的執行時所用的使用者帳號，也會影響權限，所以若非必要，<strong>不建議</strong>使用 <code class="language-plaintext highlighter-rouge">USER</code> 指令改變執行軟體的使用者。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>USER &lt;已建好的使用者名稱&gt;
+
+USER &lt;已建好的使用者 UID&gt;
+
+USER &lt;已建好的使用者名稱&gt;:&lt;已存在的使用者群組名稱&gt;
+
+USER &lt;已建好的使用者 UID&gt;:&lt;已存在的使用者群組 UID&gt;
+</code></pre></div></div>
+
+<h3 id="13-volume">13. VOLUME</h3>
+<p><strong>用途：提供在 Image 檔案建立 Data Volume 掛載點的功能。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Volume <span class="o">[</span><span class="s2">"&lt;掛載點的資料夾名稱和完整路徑&gt;"</span>, ...]
+
+Volume &lt;掛載點的資料夾名稱和完整路徑&gt; ...
+</code></pre></div></div>
+
+<p>把 Nginx 的 Image 檔裡的 /usr/share/nginx/html 和 /var/log/nginx 設定為掛載點的方式。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Volume <span class="o">[</span><span class="s2">"/usr/share/nginx/html"</span>,<span class="s2">"/var/log/nginx"</span><span class="o">]</span>
+
+Volume /usr/share/nginx/html /var/log/nginx
+</code></pre></div></div>
+
+<p>也可以用 <code class="language-plaintext highlighter-rouge">RUN</code> 指令建立資料夾，再使用 <code class="language-plaintext highlighter-rouge">VOLUME</code> 設定掛載點。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RUN <span class="nb">mkdir</span> /temp
+
+Volume /temp
+</code></pre></div></div>
+
+<h3 id="14-arg">14. ARG</h3>
+<p><strong>用途：可以讓 <code class="language-plaintext highlighter-rouge">docker bulid</code> 指令利用 <code class="language-plaintext highlighter-rouge">--build-arg</code> 選項傳入參數到 Dockerfile 裡，可以增加 Dockfile 的彈性和再利用性。</strong></p>
+
+<p>有時候某些參數變更就需要修改 Dockerfile，譬如更改環境變數，如果不想經常更改 Dockerfile，可以考慮改用 <code class="language-plaintext highlighter-rouge">ARG</code> 指令搭配 <code class="language-plaintext highlighter-rouge">docker buil</code> 的 <code class="language-plaintext highlighter-rouge">--build-arg</code> 選項。</p>
+
+<p>(1) 只給定參數名稱</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ARG &lt;參數名稱&gt;
+</code></pre></div></div>
+
+<p>(2) 同時給定參數的名稱和預設值，不一定需要設定預設值</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ARG &lt;參數名稱&gt;<span class="o">=</span>&lt;預設值&gt;
+</code></pre></div></div>
+
+<p>把 <code class="language-plaintext highlighter-rouge">ENV</code> 指令的 <code class="language-plaintext highlighter-rouge">NGINX_VERSION</code> 改用 <code class="language-plaintext highlighter-rouge">ARG</code> 指定設定為參數和預設值，然後如果要更改，就可以利用 <code class="language-plaintext highlighter-rouge">docker build --build-arg</code> 指定 <code class="language-plaintext highlighter-rouge">NGINX_VERSION 值</code>。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ARG <span class="nv">NGINX_VERSION</span><span class="o">=</span>1.13.4-1~jessie
+
+<span class="nv">$ </span>docker build <span class="nt">-t</span> nginx-ayu7 <span class="nb">.</span> <span class="nt">--build-arg</span> <span class="nv">NGINX_VERSION</span><span class="o">=</span>1.11.20-1~jessie
+</code></pre></div></div>
+
+<blockquote class="prompt-warning">
+  <p>注意！如果有相同名稱的變數，<code class="language-plaintext highlighter-rouge">ENV</code> 指令會優於 <code class="language-plaintext highlighter-rouge">ARG</code> 指令。</p>
+</blockquote>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ARG <span class="nv">NGINX_VERSION</span><span class="o">=</span>1.13.4-1~jessie
+
+ENV <span class="nv">NGINX_VERSION</span><span class="o">=</span>1.11.10-1~jessie
+
+RUN <span class="nb">echo</span> <span class="nv">$NGINX_VERSION</span>
+
+最後會 <span class="nb">echo </span>出 1.11.10-1~jessie
+</code></pre></div></div>
+
+<h2 id="四dockerfile-撰寫與-docker-build-指令建議做法">四、Dockerfile 撰寫與 docker build 指令建議做法</h2>
+<ol>
+  <li>
+    <p>資料夾
+每一個 Dockfile 都放置各自獨立的資料夾，並把所需的檔案都集中放置到資料夾內，執行 <code class="language-plaintext highlighter-rouge">docker build</code> 前也移到該資料夾後再執行，這樣可以簡化 Dockerfile 的撰寫和 <code class="language-plaintext highlighter-rouge">docker build</code> 指令的執行。</p>
+  </li>
+  <li>
+    <p>一次一種用途
+Container 和虛擬機器不同，不適合讓一個 Container 當成一個機器來執行很多功能，建議讓多個 Container 來組合成一個完整的架構，這樣 Dockfile 才能易寫易懂易維護，同時還可以利用 Container 的分散運算能力提高整個系統的可用性</p>
+  </li>
+  <li>
+    <p>只安裝需要的套件
+Image 檔案的大小有一部份是取決於安裝軟體數的多寡，改 Dockfile 和 重新產生 Image 的速度很快，有需要再修改 Dockerfile 就好了，不要為了以防萬一而加大 Image 檔案的容量，導致增加檔案傳輸或部屬的時間</p>
+  </li>
+  <li>
+    <p>Build Cache 善用 <code class="language-plaintext highlighter-rouge">docker build</code> 指令
+在產生 Image 檔時，背後有使用到一個快取的機制，所以同一個 Dockerfile 在執行第二次或第三次的 <code class="language-plaintext highlighter-rouge">docker build</code> 指令時可以發現產生的速度快很多，因為有 Build Cache 機制在運作。
+但是 Build Cache 的作用和行為會依 Dockfile 被修改的內容而不同，如果發現執行 <code class="language-plaintext highlighter-rouge">docker build</code> 後產出的 Image 檔和預期的不同，可以加入 <code class="language-plaintext highlighter-rouge">docker build --no-cache</code> 停用 Cache，以確定問題不是 Cache 造成</p>
+  </li>
+</ol>
+
+<h2 id="五用匯出和匯入的方法搬移-image-檔">五、用匯出和匯入的方法搬移 Image 檔</h2>
+<h3 id="1-匯出">1. 匯出</h3>
+<p>docker save 指令匯出的檔案為 tar。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker save <span class="nt">-o</span> &lt;匯出的檔案名稱.tar&gt; &lt;要匯出的 Image&gt;:&lt;版本&gt;
+
+<span class="nv">$ </span>docker save <span class="nt">-o</span> nginx.tar nginx:latest
+<span class="nv">$ </span>docker save <span class="nt">-o</span> nginx.tar nginx
+<span class="nv">$ </span>docker save nginx <span class="o">&gt;</span> nginx.tar
+</code></pre></div></div>
+
+<h3 id="2-匯入">2. 匯入</h3>
+<p>如果主機上已經有相同的名稱和版本的 Image 檔存在，可能會顯示已匯入但實際上沒覆蓋。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker load <span class="nt">-i</span> &lt;之前匯出的 image 檔.tar&gt;
+
+<span class="nv">$ </span>docker load <span class="nt">-i</span> nginx.tar
+<span class="nv">$ </span>docker load &lt; nginx.tar
+</code></pre></div></div>
+
+<h2 id="六用-container-匯出成新的-image-檔">六、用 Container 匯出成新的 Image 檔</h2>
+<p>除了使用 <code class="language-plaintext highlighter-rouge">docker commit</code> 指令產生新的 Image 檔，也利用 <code class="language-plaintext highlighter-rouge">docker export</code> 匯出 Container，再用 <code class="language-plaintext highlighter-rouge">docker import</code> 產生新的 Image 檔。</p>
+
+<h3 id="1-匯出-1">1. 匯出</h3>
+<p>不是將運行中的 Container 整個匯出，而只是將 Container 內部使用中的檔案系統匯出，匯出的檔案會覆蓋相同路徑下的同名稱檔案。</p>
+
+<p>如果 Container 有掛載 Date Volume，則資料卷不會被匯出。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker <span class="nb">export</span> <span class="nt">-o</span> <span class="o">[</span>匯出的檔案名稱.tar] <span class="o">[</span>Container 名稱或  ID]
+
+<span class="nv">$ </span>docker <span class="nb">export</span> <span class="o">[</span>Container 名稱或  ID] <span class="o">&gt;</span> <span class="o">[</span>匯出的檔案名稱.tar] 
+
+<span class="nv">$ </span>docker <span class="nb">export</span> <span class="nt">-o</span> nginx-export.tar nginx-hello
+</code></pre></div></div>
+
+<h3 id="2-匯入-1">2. 匯入</h3>
+<p>匯入時，不會將匯入的檔案內容轉換成運行或停用的 Container，而是直接匯入成 Image 檔，所以可以利用這種特質，將執行中的 Container 檔案內容在同一台或不同主機上，匯出新的 Image 檔。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker import  <span class="o">[</span>匯入的檔案名稱與路徑] <span class="o">[</span>Image 名稱：版本標籤]
+
+<span class="nv">$ </span>docker import nginx-export.tar ayubiz/nginx:hello
+<span class="nv">$ </span>docker images
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li>Docker 這樣學才有趣：從入門，到玩直播、挖礦</li>
+</ul>
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/nginx/2022/05/31/Nginx-conf-20.html" title="Nginx.conf 的結構">
+          <div>Nginx.conf 的結構</div>
+        </a><a class="next" href="/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html" title="利用 Docker Compose 管理多個 Container">
+          <div>利用 Docker Compose 管理多個 Container</div>
+        </a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li class="">
+          <a class="post-link" href="/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29.html" title="Nginx 限制請求的速度">
+            Nginx 限制請求的速度<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/linux/2022/03/09/Linux-iptables-7.html" title="Iptables 及常用指令介紹">
+            Iptables 及常用指令介紹<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/jekyll/2022/02/18/Welcome-to-jekyll-1.html" title="Welcome to Fred's Blog!">
+            Welcome to Fred's Blog!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/review/2022/02/25/The-first-post-in-review-5.html" title="有關 Review 這個分類項目">
+            有關 Review 這個分類項目<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

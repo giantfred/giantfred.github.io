@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Centos 7 安裝 DenyHosts 教學 | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="Centos 7 安裝 DenyHosts 教學">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="到處 try 帳密是吃飽太閒喔。">
+<meta property="og:description" content="到處 try 帳密是吃飽太閒喔。">
+<link rel="canonical" href="http://localhost:4000/linux/2022/03/15/Centos-7-use-Denyhosts-9.html">
+<meta property="og:url" content="http://localhost:4000/linux/2022/03/15/Centos-7-use-Denyhosts-9.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-03-15T00:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Centos 7 安裝 DenyHosts 教學">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GiantFred"},"dateModified":"2022-03-15T00:00:00+08:00","datePublished":"2022-03-15T00:00:00+08:00","description":"到處 try 帳密是吃飽太閒喔。","headline":"Centos 7 安裝 DenyHosts 教學","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/linux/2022/03/15/Centos-7-use-Denyhosts-9.html"},"url":"http://localhost:4000/linux/2022/03/15/Centos-7-use-Denyhosts-9.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">Centos 7 安裝 DenyHosts 教學</h1>
+  <h2 class="post-subtitle"></h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2022-03-15T00:00:00+08:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Mar 15, 2022
+    </time>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 3 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/tags.html#centos">#centos</a><a class="post-tag" href="/tags.html#denyhosts">#denyhosts</a>
+</div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>iptables v1.4.21</td>
+    </tr>
+    <tr>
+      <td>Python 2.7.5</td>
+    </tr>
+    <tr>
+      <td>Python 3.6.8</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一denyhosts-介紹">一、DenyHosts 介紹</h2>
+
+<p>DenyHosts 是一個防止暴力攻擊 SSH 的工具,<br>
+當有人想要惡意 try 機器的 SSH 帳號密碼時，它會監看及分析 SSH 的 log file (譬如 /var/log/secure)。</p>
+
+<p>當發現同一 IP 連續登入失敗，並達到所設定的條件次數時，就會將嘗試登入的 IP 加入到 <code class="language-plaintext highlighter-rouge">/etc/hosts.deny</code> 並作出封鎖。</p>
+
+<p>但是它只能單純攔截 ssh 攻擊，<br>
+若想要比較全面一點的防護可以參考這篇文章 (要放 Fail2ban 的連結)。</p>
+
+<h2 id="二denyhosts-安裝">二、DenyHosts 安裝</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在自己想要的資料夾底下將資料夾 clone 下來 (舉例在 /usr/local 資料夾)</span>
+<span class="nv">$ </span><span class="nb">cd</span> /usr/local
+<span class="nv">$ </span>git clone https://github.com/denyhosts/denyhosts.git 
+
+<span class="c"># 進入 denyhosts 資料夾</span>
+<span class="nv">$ </span><span class="nb">cd </span>denyhosts
+
+<span class="c"># 查看現在的路徑</span>
+<span class="nv">$ </span><span class="nb">pwd</span>
+
+<span class="c"># 開始安裝 DenyHosts </span>
+<span class="nv">$ </span>python setup.py <span class="nb">install</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-03-15-Centos-7-use-Denyhosts-9/1.jpg" alt=""></p>
+
+<p>如果安裝後遇到 <code class="language-plaintext highlighter-rouge">ImportError: No module named ipaddr</code> 的問題，可以透過安裝 ipaddr 模組來解決。</p>
+
+<p><img src="/assets/images/2022-03-15-Centos-7-use-Denyhosts-9/2.jpg" alt=""></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 要先安裝 python-pip (已安裝過可跳過此步驟)</span>
+<span class="nv">$ </span>yum <span class="nb">install </span>python-pip
+
+<span class="c"># 安裝 ipaddr 模組</span>
+<span class="nv">$ </span>pip <span class="nb">install </span>ipaddr
+
+<span class="c"># 然後再安裝一次 DenyHosts  </span>
+<span class="nv">$ </span>python setup.py <span class="nb">install</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-03-15-Centos-7-use-Denyhosts-9/3.jpg" alt=""></p>
+
+<h2 id="三denyhosts-基本設定">三、DenyHosts 基本設定</h2>
+<h3 id="1-denyhosts-的設定檔">(1) DenyHosts 的設定檔</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/etc/denyhosts.conf
+</code></pre></div></div>
+
+<h3 id="2-編輯檔案及介紹">(2) 編輯檔案及介紹</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/denyhosts.conf
+</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># sshd 登入的 log 位置</span>
+SECURE_LOG <span class="o">=</span> /var/log/secure
+
+<span class="c"># 裡面放黑名單 IP 的檔案，預設在 /var/lib/denyhosts</span>
+<span class="c"># 此篇範例設在 /usr/local/denyhosts/data</span>
+WORK_DIR <span class="o">=</span> /usr/local/denyhosts/data
+
+<span class="c"># DenyHosts 3.0 後就加入了 iptables 同步封鎖的功能</span>
+<span class="c"># 如果不要這個功能就將它註解</span>
+IPTABLES <span class="o">=</span> /sbin/iptables
+
+<span class="c"># ssh 的 port，若一個以上的 port 要用逗號分隔 (ex: 11,22,33)</span>
+BLOCKPORT <span class="o">=</span> 22
+
+<span class="c"># 多久清除一次已封鎖的 IP</span>
+PURGE_DENY <span class="o">=</span> 1w
+
+<span class="c"># 是否做域名反解</span>
+HOSTNAME_LOOKUP <span class="o">=</span> No
+
+<span class="c"># 如果登入成功，各個 IP 地址的失敗次數將重置為 0</span>
+RESET_ON_SUCCESS <span class="o">=</span> <span class="nb">yes</span>
+
+<span class="c"># 多久執行一次預設清理，設定值與 PURFE_DENY 一樣即可</span>
+DAEMON_PURGE <span class="o">=</span> 1w
+
+<span class="c"># 允許無效用戶登錄失敗的次數</span>
+DENY_THRESHOLD_INVALID <span class="o">=</span> 5
+
+<span class="c"># 允許普通用戶登錄失敗的次數</span>
+DENY_THRESHOLD_VALID <span class="o">=</span> 10
+
+<span class="c"># 允許 root 登錄失敗的次數</span>
+DENY_THRESHOLD_ROOT <span class="o">=</span> 3
+</code></pre></div></div>
+
+<h2 id="四work_dir-資料夾底下會有的檔案">四、WORK_DIR 資料夾底下會有的檔案</h2>
+<p>裡面是放黑名單 IP 的檔案。</p>
+<ol>
+  <li>hosts</li>
+  <li>hosts-restricted</li>
+  <li>hosts-root</li>
+  <li>hosts-valid</li>
+  <li>users-hosts</li>
+</ol>
+
+<h2 id="五解除被封鎖的-ip">五、解除被封鎖的 IP</h2>
+<p>開啟以下六個檔案，個別手動註解或刪除解封的 IP。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 此篇範例的 WORK_DIR 路徑在 /usr/local/denyhosts/data </span>
+<span class="nv">$ </span>vim /etc/hosts.deny
+<span class="nv">$ </span>vim /usr/local/denyhosts/data/hosts
+<span class="nv">$ </span>vim /usr/local/denyhosts/data/hosts-restricted
+<span class="nv">$ </span>vim /usr/local/denyhosts/data/hosts-root
+<span class="nv">$ </span>vim /usr/local/denyhosts/data/hosts-valid
+<span class="nv">$ </span>vim /usr/local/denyhosts/data/users-hosts
+</code></pre></div></div>
+<p>也有一些指令可以直接解除被封鎖的 IP，但是實際測試不起作用，所以暫且不談。</p>
+
+<h2 id="六denyhosts-的白名單-ip-設定">六、Denyhosts 的白名單 IP 設定</h2>
+<p>若想要設定<strong>不想</strong>被 DenyHosts 封鎖的 IP，可以建立白名單。</p>
+
+<p>在 WORK_DIR 路徑建立一個新檔案 <code class="language-plaintext highlighter-rouge">allowed-hosts</code>，檔案內容是一行各一個白名單 IP。</p>
+
+<p>這個 IP 還是會在 /etc/hosts.deny 裡面，只是會被註解。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 進入 WORK_DIR 路徑</span>
+<span class="nv">$ </span><span class="nb">cd</span> /usr/local/denyhosts/data
+
+<span class="c"># 建立並編輯白名單檔案</span>
+<span class="nv">$ </span>vim allowed-hosts 
+</code></pre></div></div>
+<h2 id="七開始使用-denyhosts">七、開始使用 Denyhosts</h2>
+
+<h3 id="1-啟動-denyhosts">1. 啟動 Denyhosts</h3>
+<blockquote>
+  <p>啟動前，務必要先清空或分割 sshd 的 log 檔，不然自己會先被封鎖。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 要先到 Denyhosts 的資料夾底下，再開始做其他動作</span>
+<span class="nv">$ </span><span class="nb">cd</span> /usr/local/denyhosts
+
+<span class="c"># 啟動 Denyhosts</span>
+<span class="nv">$ </span>./daemon-control-dist start
+
+<span class="c"># 重新啟動 Denyhosts</span>
+<span class="nv">$ </span>./daemon-control-dist restart
+
+<span class="c"># 查看 Denyhosts 狀態 </span>
+<span class="nv">$ </span>./daemon-control-dist status  
+
+<span class="c"># 停止 Denyhosts</span>
+<span class="nv">$ </span>./daemon-control-dist stop
+</code></pre></div></div>
+<h3 id="2-分割-sshd-的-log-檔-varlogsecure">2. 分割 sshd 的 log 檔 (/var/log/secure)</h3>
+<p>想要馬上分割 /var/log/secure 檔案，可以強制執行 logrotate，而不用等定期的分割時間。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>logrotate <span class="nt">-vf</span> /etc/logrotate.conf 
+</code></pre></div></div>
+
+<h2 id="八若-varlogsecure-不紀錄-log">八、若 /var/log/secure 不紀錄 log</h2>
+<p>先試著重新啟動 rsyslog，再觀察看看。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>service rsyslog restart 
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://sourceforge.net/projects/denyhosts/files/denyhosts/">sourceforge DenyHosts Files</a></li>
+  <li><a href="https://github.com/denyhosts/denyhosts">DenyHosts Github</a></li>
+  <li><a href="https://sourceforge.net/p/denyhosts/bugs/64/?limit=25">#64 option –purgeip does not work</a></li>
+</ul>
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/linux/2022/03/10/Centos-7-check-reboot-is-required-8.html" title="檢查 CentOS 7 的系統或服務是否需要重新啟動">
+          <div>檢查 CentOS 7 的系統或服務是否需要重新啟動</div>
+        </a><a class="next" href="/linux/2022/03/16/Centos-7-ACL-permission-10.html" title="更詳細的 ACL 權限">
+          <div>更詳細的 ACL 權限</div>
+        </a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li class="">
+          <a class="post-link" href="/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html" title="哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能">
+            哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/example/2017/12/18/video-example.html" title="Video example">
+            Video example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/github%20pages/2022/02/21/How-to-use-Github-Pages-2.html" title="Github Pages 設定">
+            Github Pages 設定<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/linux/2022/03/09/Linux-iptables-7.html" title="Iptables 及常用指令介紹">
+            Iptables 及常用指令介紹<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

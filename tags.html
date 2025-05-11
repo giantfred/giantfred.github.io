@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Tags | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="Tags">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+<meta property="og:description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+<link rel="canonical" href="http://localhost:4000/tags.html">
+<meta property="og:url" content="http://localhost:4000/tags.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Tags">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"GiantFred"},"description":"Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.","headline":"Tags","url":"http://localhost:4000/tags.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <div class="page-segments">
+  <ul class="page-segments-list">
+    
+    <h2 id="MySQL" class="segment-name">MySQL</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 30, 2023</span>
+<span>
+  <a class="post-link" href="/mysql/2023/03/30/Mysql-set-error-log-30.html">
+    LNMP MySQL 設定 error_log<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="acl permission" class="segment-name">acl permission</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 16, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/16/Centos-7-ACL-permission-10.html">
+    更詳細的 ACL 權限<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="book" class="segment-name">book</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Nov 29, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/11/29/Book-review-4-28.html">
+    閱讀心得(4)：強大內心的自我對話習慣<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Aug 22, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/08/22/Book-review-3-26.html">
+    閱讀心得(3)：在意別人而受傷，怎麼找回快樂<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 27, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/05/27/Book-review-2-17.html">
+    閱讀心得(2)：有效到讓人中毒的最強心理學<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 25, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/03/25/Book-review-1-12.html">
+    閱讀心得(1)：一杯熱奶茶的等待<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="centos" class="segment-name">centos</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jul 11, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/11/Create-docker-registry-24.html">
+    架設自己的 Docker Registry<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jul 05, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html">
+    利用 Docker Compose 管理多個 Container<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jun 16, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/06/16/Create-docker-image-21.html">
+    各種自製 Docker Image 的方法<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 30, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/30/Advanced-Docker-Operations-19.html">
+    Docker Container 的進階操作<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 28, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/28/Docker-Command-18.html">
+    Docker 基本指令<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 26, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/26/Centos-7-install-Docker-16.html">
+    CentOS 7 安裝 Docker<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Apr 13, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/04/13/Linux-history-command-add-timestamp-and-user-information-14.html">
+    將 History 指令加上時間戳及使用者資訊<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 29, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/29/how-to-use-Tmux-13.html">
+    Tmux－視窗分割的好幫手<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 23, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/23/What-is-rootkit-and-Centos-7-use-rkhunter-11.html">
+    用 rkhunter 把 rootkit 通通抓起來！<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 16, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/16/Centos-7-ACL-permission-10.html">
+    更詳細的 ACL 權限<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 15, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/15/Centos-7-use-Denyhosts-9.html">
+    Centos 7 安裝 DenyHosts 教學<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 10, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/10/Centos-7-check-reboot-is-required-8.html">
+    檢查 CentOS 7 的系統或服務是否需要重新啟動<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 09, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/09/Linux-iptables-7.html">
+    Iptables 及常用指令介紹<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 04, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/04/CentOS-7-install-fish-shell-6.html">
+    使用 Fish Shell 讓你的 Linux CLI 比別人更炫炮！<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Feb 23, 2022</span>
+<span>
+  <a class="post-link" href="/mysql/2022/02/23/MySQL-8-0-commands-4.html">
+    MySQL 8.0 指令<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="container" class="segment-name">container</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jul 11, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/11/Create-docker-registry-24.html">
+    架設自己的 Docker Registry<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jul 05, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html">
+    利用 Docker Compose 管理多個 Container<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jun 16, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/06/16/Create-docker-image-21.html">
+    各種自製 Docker Image 的方法<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 30, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/30/Advanced-Docker-Operations-19.html">
+    Docker Container 的進階操作<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 28, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/28/Docker-Command-18.html">
+    Docker 基本指令<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="denyhosts" class="segment-name">denyhosts</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 15, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/15/Centos-7-use-Denyhosts-9.html">
+    Centos 7 安裝 DenyHosts 教學<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="docker" class="segment-name">docker</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jul 11, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/11/Create-docker-registry-24.html">
+    架設自己的 Docker Registry<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jul 05, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html">
+    利用 Docker Compose 管理多個 Container<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jun 16, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/06/16/Create-docker-image-21.html">
+    各種自製 Docker Image 的方法<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 30, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/30/Advanced-Docker-Operations-19.html">
+    Docker Container 的進階操作<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 28, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/28/Docker-Command-18.html">
+    Docker 基本指令<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 26, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/05/26/Centos-7-install-Docker-16.html">
+    CentOS 7 安裝 Docker<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="docker registry" class="segment-name">docker registry</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jul 11, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/11/Create-docker-registry-24.html">
+    架設自己的 Docker Registry<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="docker-compose" class="segment-name">docker-compose</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jul 05, 2022</span>
+<span>
+  <a class="post-link" href="/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html">
+    利用 Docker Compose 管理多個 Container<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="example" class="segment-name">example</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 05, 2018</span>
+<span>
+  <a class="post-link" href="/markdown/2018/12/05/an-exhibit-of-markdown.html">
+    An exhibit of Markdown<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="top-post">
+<span class="post-meta">Jun 10, 2017</span>
+<span>
+  <a class="post-link" href="/markdown/2017/06/10/quick-mardown-example.html">
+    Quick markdown example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="feeling" class="segment-name">feeling</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jul 07, 2022</span>
+<span>
+  <a class="post-link" href="/feeling/2022/07/07/The-first-post-in-feeling-23.html">
+    有關 Feeling 這個分類項目<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="geoip2" class="segment-name">geoip2</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Aug 11, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25.html">
+    利用 Nginx 的 GeoIP2 模組限制特定國家 IP 造訪網站<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="geolite2" class="segment-name">geolite2</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Aug 11, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25.html">
+    利用 Nginx 的 GeoIP2 模組限制特定國家 IP 造訪網站<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="gitHub pages" class="segment-name">gitHub pages</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 21, 2022</span>
+<span>
+  <a class="post-link" href="/github%20pages/2022/02/21/How-to-use-Github-Pages-2.html">
+    Github Pages 設定<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Feb 18, 2022</span>
+<span>
+  <a class="post-link" href="/jekyll/2022/02/18/Welcome-to-jekyll-1.html">
+    Welcome to Fred's Blog!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="github pages" class="segment-name">github pages</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 21, 2022</span>
+<span>
+  <a class="post-link" href="/github%20pages/2022/02/21/MacOS-install-ruby-and-jekyll-to-create-Github-Pages-3.html">
+    在 MacOS 上安裝 Ruby 與 Jekyll<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="iptables" class="segment-name">iptables</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 09, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/09/Linux-iptables-7.html">
+    Iptables 及常用指令介紹<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="jekyll" class="segment-name">jekyll</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 21, 2022</span>
+<span>
+  <a class="post-link" href="/github%20pages/2022/02/21/MacOS-install-ruby-and-jekyll-to-create-Github-Pages-3.html">
+    在 MacOS 上安裝 Ruby 與 Jekyll<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="top-post">
+<span class="post-meta">Jan 01, 2015</span>
+<span>
+  <a class="post-link" href="/jekyll/2015/01/01/welcome-to-jekyll.html">
+    Welcome to Jekyll!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="jeykll" class="segment-name">jeykll</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 18, 2022</span>
+<span>
+  <a class="post-link" href="/jekyll/2022/02/18/Welcome-to-jekyll-1.html">
+    Welcome to Fred's Blog!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="jitsi" class="segment-name">jitsi</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jan 10, 2023</span>
+<span>
+  <a class="post-link" href="/ubuntu/azure/2023/01/10/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30.html">
+    將 Jitsi meet 架設在 Azure 雲端上<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="limit" class="segment-name">limit</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 20, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29.html">
+    Nginx 限制請求的速度<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="macos" class="segment-name">macos</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 21, 2022</span>
+<span>
+  <a class="post-link" href="/github%20pages/2022/02/21/MacOS-install-ruby-and-jekyll-to-create-Github-Pages-3.html">
+    在 MacOS 上安裝 Ruby 與 Jekyll<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="markdown" class="segment-name">markdown</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 05, 2018</span>
+<span>
+  <a class="post-link" href="/markdown/2018/12/05/an-exhibit-of-markdown.html">
+    An exhibit of Markdown<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="mermaid" class="segment-name">mermaid</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 08, 2017</span>
+<span>
+  <a class="post-link" href="/example/2017/12/08/mermaid-example.html">
+    Mermaid example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="module" class="segment-name">module</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 20, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29.html">
+    Nginx 限制請求的速度<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Oct 13, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html">
+    哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Aug 11, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25.html">
+    利用 Nginx 的 GeoIP2 模組限制特定國家 IP 造訪網站<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="mysql" class="segment-name">mysql</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 23, 2022</span>
+<span>
+  <a class="post-link" href="/mysql/2022/02/23/MySQL-8-0-commands-4.html">
+    MySQL 8.0 指令<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="naxsi" class="segment-name">naxsi</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Oct 13, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html">
+    哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="nginx" class="segment-name">nginx</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jan 10, 2023</span>
+<span>
+  <a class="post-link" href="/ubuntu/azure/2023/01/10/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30.html">
+    將 Jitsi meet 架設在 Azure 雲端上<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Dec 20, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29.html">
+    Nginx 限制請求的速度<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Oct 13, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html">
+    哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Aug 11, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25.html">
+    利用 Nginx 的 GeoIP2 模組限制特定國家 IP 造訪網站<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 31, 2022</span>
+<span>
+  <a class="post-link" href="/nginx/2022/05/31/Nginx-conf-20.html">
+    Nginx.conf 的結構<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="php" class="segment-name">php</h2>
+      
+      
+        <li class="">
+<span class="post-meta">May 05, 2022</span>
+<span>
+  <a class="post-link" href="/php/2022/05/05/PHP-FPM-15.html">
+    PHP-FPM 是什麼？<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="php-fpm" class="segment-name">php-fpm</h2>
+      
+      
+        <li class="">
+<span class="post-meta">May 05, 2022</span>
+<span>
+  <a class="post-link" href="/php/2022/05/05/PHP-FPM-15.html">
+    PHP-FPM 是什麼？<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="plantuml" class="segment-name">plantuml</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 04, 2017</span>
+<span>
+  <a class="post-link" href="/example/2017/12/04/plantuml-example.html">
+    Plantuml example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="review" class="segment-name">review</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Nov 29, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/11/29/Book-review-4-28.html">
+    閱讀心得(4)：強大內心的自我對話習慣<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Aug 22, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/08/22/Book-review-3-26.html">
+    閱讀心得(3)：在意別人而受傷，怎麼找回快樂<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">May 27, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/05/27/Book-review-2-17.html">
+    閱讀心得(2)：有效到讓人中毒的最強心理學<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Mar 25, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/03/25/Book-review-1-12.html">
+    閱讀心得(1)：一杯熱奶茶的等待<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Feb 25, 2022</span>
+<span>
+  <a class="post-link" href="/review/2022/02/25/The-first-post-in-review-5.html">
+    有關 Review 這個分類項目<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="rkhunter" class="segment-name">rkhunter</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 23, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/23/What-is-rootkit-and-Centos-7-use-rkhunter-11.html">
+    用 rkhunter 把 rootkit 通通抓起來！<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="rootkit" class="segment-name">rootkit</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 23, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/23/What-is-rootkit-and-Centos-7-use-rkhunter-11.html">
+    用 rkhunter 把 rootkit 通通抓起來！<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="ruby" class="segment-name">ruby</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Feb 21, 2022</span>
+<span>
+  <a class="post-link" href="/github%20pages/2022/02/21/MacOS-install-ruby-and-jekyll-to-create-Github-Pages-3.html">
+    在 MacOS 上安裝 Ruby 與 Jekyll<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="shell" class="segment-name">shell</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 04, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/04/CentOS-7-install-fish-shell-6.html">
+    使用 Fish Shell 讓你的 Linux CLI 比別人更炫炮！<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="system" class="segment-name">system</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 10, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/10/Centos-7-check-reboot-is-required-8.html">
+    檢查 CentOS 7 的系統或服務是否需要重新啟動<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="table" class="segment-name">table</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 15, 2017</span>
+<span>
+  <a class="post-link" href="/example/2017/12/15/table-example.html">
+    Table example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="test" class="segment-name">test</h2>
+      
+      
+        <li class="">
+<span class="post-meta">May 26, 2018</span>
+<span>
+  <a class="post-link" href="/markdown/2018/05/26/mathjax-test.html">
+    Mathjax Test<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Jan 01, 2016</span>
+<span>
+  <a class="post-link" href="/markdown/2016/01/01/another-test-markdown.html">
+    Another test markdown<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+        <li class="">
+<span class="post-meta">Feb 28, 2015</span>
+<span>
+  <a class="post-link" href="/markdown/2015/02/28/test-markdown.html">
+    Test markdown<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="theme" class="segment-name">theme</h2>
+      
+      
+        <li class="top-post">
+<span class="post-meta">Jan 01, 2015</span>
+<span>
+  <a class="post-link" href="/jekyll/2015/01/01/welcome-to-jekyll.html">
+    Welcome to Jekyll!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="timestamp" class="segment-name">timestamp</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Apr 13, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/04/13/Linux-history-command-add-timestamp-and-user-information-14.html">
+    將 History 指令加上時間戳及使用者資訊<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="tmux" class="segment-name">tmux</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Mar 29, 2022</span>
+<span>
+  <a class="post-link" href="/linux/2022/03/29/how-to-use-Tmux-13.html">
+    Tmux－視窗分割的好幫手<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="ubuntu" class="segment-name">ubuntu</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Jan 10, 2023</span>
+<span>
+  <a class="post-link" href="/ubuntu/azure/2023/01/10/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30.html">
+    將 Jitsi meet 架設在 Azure 雲端上<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="video" class="segment-name">video</h2>
+      
+      
+        <li class="">
+<span class="post-meta">Dec 18, 2017</span>
+<span>
+  <a class="post-link" href="/example/2017/12/18/video-example.html">
+    Video example<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+    <h2 id="yat" class="segment-name">yat</h2>
+      
+      
+        <li class="top-post">
+<span class="post-meta">Jan 01, 2015</span>
+<span>
+  <a class="post-link" href="/jekyll/2015/01/01/welcome-to-jekyll.html">
+    Welcome to Jekyll!<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+</span>
+</li>
+        
+      
+    
+  </ul>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="common-list">
+  <ul>
+    <li>
+      <a href="/index.html">
+        All<span>45</span>
+      </a>
+    </li>
+
+    
+      <li>
+        <a href="/tags.html#h-MySQL">
+          MySQL <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-acl%20permission">
+          acl permission <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-book">
+          book <span>4</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-centos">
+          centos <span>15</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-container">
+          container <span>5</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-denyhosts">
+          denyhosts <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-docker">
+          docker <span>6</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-docker%20registry">
+          docker registry <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-docker-compose">
+          docker-compose <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-example">
+          example <span>2</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-feeling">
+          feeling <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-geoip2">
+          geoip2 <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-geolite2">
+          geolite2 <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-gitHub%20pages">
+          gitHub pages <span>2</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-github%20pages">
+          github pages <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-iptables">
+          iptables <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-jekyll">
+          jekyll <span>2</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-jeykll">
+          jeykll <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-jitsi">
+          jitsi <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-limit">
+          limit <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-macos">
+          macos <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-markdown">
+          markdown <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-mermaid">
+          mermaid <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-module">
+          module <span>3</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-mysql">
+          mysql <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-naxsi">
+          naxsi <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-nginx">
+          nginx <span>5</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-php">
+          php <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-php-fpm">
+          php-fpm <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-plantuml">
+          plantuml <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-review">
+          review <span>5</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-rkhunter">
+          rkhunter <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-rootkit">
+          rootkit <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-ruby">
+          ruby <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-shell">
+          shell <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-system">
+          system <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-table">
+          table <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-test">
+          test <span>3</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-theme">
+          theme <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-timestamp">
+          timestamp <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-tmux">
+          tmux <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-ubuntu">
+          ubuntu <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-video">
+          video <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/tags.html#h-yat">
+          yat <span>1</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

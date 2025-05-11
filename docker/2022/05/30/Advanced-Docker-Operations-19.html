@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Docker Container 的進階操作 | GiantFred’s Blog</title>
+<meta name="generator" content="Jekyll v4.4.1">
+<meta property="og:title" content="Docker Container 的進階操作">
+<meta name="author" content="GiantFred">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="都是很值得學習的操作！">
+<meta property="og:description" content="都是很值得學習的操作！">
+<link rel="canonical" href="http://localhost:4000/docker/2022/05/30/Advanced-Docker-Operations-19.html">
+<meta property="og:url" content="http://localhost:4000/docker/2022/05/30/Advanced-Docker-Operations-19.html">
+<meta property="og:site_name" content="GiantFred’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-05-30T00:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Docker Container 的進階操作">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GiantFred"},"dateModified":"2022-05-30T00:00:00+08:00","datePublished":"2022-05-30T00:00:00+08:00","description":"都是很值得學習的操作！","headline":"Docker Container 的進階操作","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/docker/2022/05/30/Advanced-Docker-Operations-19.html"},"url":"http://localhost:4000/docker/2022/05/30/Advanced-Docker-Operations-19.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="">
+  <link rel="canonical" href="http://localhost:4000">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <script src="/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="GiantFred's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/">
+  <img class="site-favicon" title="GiantFred's Blog" src="" onerror="this.style.display='none'">
+  GiantFred's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/about.html">ABOUT</a><a class="page-link" href="/archives.html">ARCHIVES</a><a class="page-link" href="/categories.html">CATEGORIES</a><a class="page-link" href="/">HOME</a><a class="page-link" href="/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+        document.dispatchEvent(new Event('theme-changed'));
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">Docker Container 的進階操作</h1>
+  <h2 class="post-subtitle"></h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2022-05-30T00:00:00+08:00" itemprop="datePublished"><i class="fa fa-calendar"></i> May 30, 2022
+    </time>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 9 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/tags.html#centos">#centos</a><a class="post-tag" href="/tags.html#docker">#docker</a><a class="post-tag" href="/tags.html#container">#container</a>
+</div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>Docker 1.13.1</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一幫-container-取名字">一、幫 Container 取名字</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 執行 Container 時，加上 --name 可同時命名該 Container 的名字</span>
+<span class="c"># 若是不取名，就會有 Docker 自動產生的名字</span>
+<span class="nv">$ </span>docker run <span class="nt">--name</span> &lt;Container 名稱&gt; <span class="nt">-p</span> &lt;對外的埠號&gt;:&lt;預設的埠號&gt; <span class="nt">-d</span> &lt;Docker Image 名稱&gt;
+
+<span class="c"># 把 nginx Container 取名成 nginx</span>
+<span class="nv">$ </span>docker run <span class="nt">--name</span> nginx <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+<span class="nv">$ </span>docker ps <span class="nt">-a</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/1.jpg" alt=""></p>
+
+<p>Container 有自訂名稱後，就可以用指令去操作。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker stop nginx
+<span class="nv">$ </span>docker start nginx
+<span class="nv">$ </span>docker restart nginx
+<span class="nv">$ </span>docker <span class="nb">rm </span>nginx
+</code></pre></div></div>
+
+<h2 id="二將-container--設定環境變數">二、將 Container  設定環境變數</h2>
+<p>有些軟體的 Container 啟動時要同時設定好一些變數讓它可以讀取來做為初始的設定值，<br>
+例如：預設的管理者帳號密碼、預設執行目錄、同意軟體授權等參數設定。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 執行 Container 的同時加上 -e 可以設定變數值</span>
+docker run <span class="nt">-e</span> &lt;變數名稱&gt;<span class="o">=</span>&lt;變數值&gt; <span class="nt">-p</span> &lt;對外的埠號&gt;:&lt;預設的埠號&gt; <span class="nt">-d</span> &lt;Docker Image 名稱&gt;
+
+<span class="c"># MySQL 資料庫需要事先透過 MYSQL_ROOT_PASSWORD 指定資料庫管理者密碼</span>
+<span class="c"># 一開始先指定 root 密碼是 123456789，成功啟動後再用 docker exec 執行 mysql 操作 MySQL，就可以用剛剛設定的密碼成功登入</span>
+<span class="nv">$ </span>docker run <span class="nt">--name</span> mysql <span class="nt">-e</span> <span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span>123456789 <span class="nt">-d</span> mysql
+<span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span> mysql mysql <span class="nt">-p</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/2.jpg" alt=""></p>
+
+<h2 id="三docker-run-vs-docker-create">三、docker run v.s. docker create?</h2>
+<p><code class="language-plaintext highlighter-rouge">docker create</code> 要建立一個新的 Container，需搭配 <code class="language-plaintext highlighter-rouge">docker start</code> 指令才會啟動，</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker run</code> 在執行之後就會立刻運行。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker run --name nginx-run -p 8080:80 -d nginx</code>
+-&gt; 下指令後，Container 的狀態會是 <code class="language-plaintext highlighter-rouge">UP</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">docker create --name nginx-create -p 8081:80 nginx</code>
+-&gt; 下指令後，Container 的狀態會是 <code class="language-plaintext highlighter-rouge">Created</code></p>
+
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/3.jpg" alt=""></p>
+
+<h2 id="四外掛-container-的儲存空間把資料存下來">四、外掛 Container 的儲存空間，把資料存下來</h2>
+
+<p>如果資料是放在 Container 內，當 Container 掛掉且不得不刪掉時（通常 exit code 不等於 0 就會強制刪掉 Container），裡面的資料也會跟著一起被刪掉，所以將儲存空間外掛是比較保險且安全的方式。</p>
+
+<p>而且，假設使用資料庫的 Container，資料庫檔案位置會是在 Container 內部，當不斷把資料寫進資料庫，用 <code class="language-plaintext highlighter-rouge">docker ps -a</code> 查看會發現 Container 佔用的空間會不斷的長大。</p>
+
+<p>Docker Container 的檔案系統是用疊層（Layer）的方式儲存，會比常見的檔案儲存更耗空間（用一種層疊的方式來新增資料，每次新增資料，就會產生一層新資料層來疊在原來所使用的 Docker Image 上）。</p>
+
+<p>直接把資料庫檔案存在 Container 內部，就會因為產生大量的新資料層而快速吃掉硬碟空間，如果之後想把資料帶走，就要匯出這個 Container 來產生新的 Docker Image，超級麻煩。</p>
+
+<p>所以就可以外掛 Container 的儲存空間，把資料另外存下來。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 執行 Container 的同時加上 -v 可以掛上外部的硬碟空間</span>
+<span class="nv">$ </span>docker run <span class="nt">-v</span> &lt;外部資料夾或檔案的完整路徑&gt;:&lt;Container 內部要被取代的資料夾完整路徑&gt; <span class="nt">-p</span> &lt;對外的埠號&gt;:&lt;預設的埠號&gt; <span class="nt">-d</span> &lt;Docker Image 名稱&gt;
+
+<span class="c"># nginx Container 內的 /usr/share/nginx/html 資料夾改成主機上的 /var/www 來取代</span>
+<span class="c"># 如果主機上沒有 /var/www 資料夾存在，docker run 會自己新增</span>
+<span class="nv">$ </span>docker run <span class="nt">-v</span> /var/www:/usr/share/nginx/html <span class="nt">-name</span> nginx-store <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+
+<span class="c"># 除了可以取代資料夾，也可以取代檔案，常見用法是取代設定檔，用預先自訂好的設定檔取代 Docker Image 內建的設定檔</span>
+<span class="c"># 將本機上的 /home/nginx-test/nginx.conf 取代 Container 內的 /etc/nginx.nginx.conf</span>
+<span class="nv">$ </span>docker run <span class="nt">-v</span> /home/nginx-test/nginx.conf:/etc/nginx/nginx.conf <span class="nt">-v</span> /var/www:/usr/share/nginx/html <span class="nt">-name</span> nginx-store <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/4.jpg" alt=""></p>
+
+<h2 id="五直接執行-container-內的程式或指令">五、直接執行 Container 內的程式或指令</h2>
+<p>有些 Container 用途是被當作軟體工具包，<code class="language-plaintext highlighter-rouge">docker run</code> 可以直接在最後面加上想要執行的指令，讓 Container 一啟動完成後就執行指定的指令。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run &lt;Docker Image 名稱&gt; &lt;指令完整檔案路徑與名稱及指令選項&gt;
+
+<span class="c"># 想在 Windows 環境用 ls 操作</span>
+<span class="c"># 使用 ubuntu 的 ls 指令，但這樣只會把 ubuntu Container 跟目錄的檔案列出來</span>
+<span class="c"># 所以想要把 Windows 上的某個資料夾檔案清單列出就要搭配 -v，將主機的資料夾掛載到 Container 裡面，讓 Container 內的程式可以看的到它，進而用做各項操作</span>
+<span class="nv">$ </span>docker run ubuntu /bin/ls
+<span class="nv">$ </span>docker run <span class="nt">-v</span> C:<span class="se">\d</span>ownloads:/home/test ubuntu /bin/ls <span class="nt">-l</span> /home/test
+</code></pre></div></div>
+
+<h2 id="六讓-container-在執行結束後自動移除">六、讓 Container 在執行結束後自動移除</h2>
+<p>被啟動的 Container 停止後就會自我毀滅~</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--rm</span> <span class="nt">-v</span> C:<span class="se">\d</span>ownloads:/home/test ubuntu /bin/ls <span class="nt">-l</span> /home/test
+</code></pre></div></div>
+
+<h2 id="七讓-container-掛掉後自動重新啟動或開機後自動啟動">七、讓 Container 掛掉後自動重新啟動，或開機後自動啟動</h2>
+
+<p><code class="language-plaintext highlighter-rouge">docker run</code> 可以使用 <code class="language-plaintext highlighter-rouge">--restart</code> 來決定要不要嘗試自動重新啟動 Container。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker run --restart</code> 的選項有：<code class="language-plaintext highlighter-rouge">no</code>、<code class="language-plaintext highlighter-rouge">always</code>、<code class="language-plaintext highlighter-rouge">unless-stopped</code>、<code class="language-plaintext highlighter-rouge">on-failure</code></p>
+
+<ul>
+  <li>
+<code class="language-plaintext highlighter-rouge">no</code>：預設值，不自動重新啟動。</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">always</code>：（exit code 必須是正常值=0）可以達到電腦開機就自動啟動 Container 的效果，因為這個 Container 會跟 Docker 本身的 Daemon 綁在一起，所以 Docker 只要一啟動，有 --restart=always 的 Container 就會跟著啟動。</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">unless-stopped</code>：（exit code 必須是正常值=0）Container 會自動啟動，但是不會在電腦開機時自動啟動。</li>
+  <li>
+<code class="language-plaintext highlighter-rouge">on-failure</code>：exit code 不等於 0 時自動啟動，因為若 exit code 不等於 0 代表可能是錯誤造成的退出或結束，通常會指定自動重啟的次數，以防造成無窮啟動迴圈。</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--restart</span><span class="o">=</span>always nginx
+<span class="nv">$ </span>docker run <span class="nt">--restart</span><span class="o">=</span>unless-stopped nginx
+<span class="nv">$ </span>docker run <span class="nt">--restart</span><span class="o">=</span>on-failure:5 nginx
+</code></pre></div></div>
+
+<h2 id="八進入-container-操作命令列">八、進入 Container 操作命令列</h2>
+<blockquote class="prompt-info">
+  <p>用 <code class="language-plaintext highlighter-rouge">docker run</code> 也可以 -&gt; <code class="language-plaintext highlighter-rouge">docker run -it --name nginx-cmd nginx /bin/bash</code></p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -i：互動模式</span>
+<span class="c"># -t：把指令執行結果送出來</span>
+<span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span> &lt;Container 名稱或 ID&gt; &lt;指令完整檔案路徑與名稱及指令選項&gt;
+
+<span class="c"># 進入 nginx 操作命令列</span>
+<span class="nv">$ </span>docker run <span class="nt">--name</span> nginx-cmd <span class="nt">-d</span> nginx
+<span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span> nginx-cmd /bin/bash
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/5.jpg" alt=""></p>
+
+<h2 id="九container-綁定指定的-ip-位址正式的服務環境必用">九、Container 綁定指定的 IP 位址（正式的服務環境必用）</h2>
+<p>如果只有指定埠號而沒有指定 Container 要綁到哪個 IP 位址，預設會綁定到主機的 0.0.0.0，表示這個主機上的任一組 IP 都可以連到這個 Container。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 指定 Container 綁定 IP位址</span>
+<span class="nv">$ </span>docker run <span class="nt">-p</span> &lt;主機的 IP 位址&gt;:&lt;主機的連接埠號&gt;:&lt;Container 的連接埠號&gt; <span class="nt">-d</span> &lt;Docker Image 名稱&gt;
+
+<span class="c"># 假如主機上有兩個網站、兩組 IP 位址，分別是 192.168.1.1 和 10.0.1.1，如果想要用 192.168.1.1 來連到這個 nginx container：</span>
+<span class="nv">$ </span>docker run <span class="nt">-p</span> 192.168.1.1:80:80 <span class="nt">-d</span> nginx
+
+<span class="c"># 如果只想讓主機自己可以連上：</span>
+<span class="nv">$ </span>docker run <span class="nt">-p</span> 127.0.0.1:80:80 <span class="nt">-d</span> nginx
+</code></pre></div></div>
+<h2 id="十建立多個-container-專用的-docker-網路">十、建立多個 Container 專用的 Docker 網路</h2>
+<blockquote class="prompt-info">
+  <p>除了 <code class="language-plaintext highlighter-rouge">docker network</code> 之外，<code class="language-plaintext highlighter-rouge">docker run</code> 有個 <code class="language-plaintext highlighter-rouge">--link</code> 選項也可以把兩個 Container 串接在一起，不過限制多，官方也不建議繼續使用 Docker link 的功能，還是建議用 Docker 網路，不然就是用 Docker Compose 來達到。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 建立 Docker 網路</span>
+<span class="nv">$ </span>docker network create &lt;Docker 網路名稱&gt;
+
+<span class="c"># 啟動 Container 並加入網路</span>
+<span class="nv">$ </span>docker run <span class="nt">--name</span><span class="o">=</span>&lt;Contianer 名稱&gt; <span class="nt">--net</span><span class="o">=</span>&lt;網路名稱&gt;
+</code></pre></div></div>
+<p>很多時候都會需要運行兩個以上的軟體，例如使用部落格軟體，就會同時用到網頁伺服器和資料庫系統。</p>
+
+<p>在虛擬機時，會把網站伺服器跟資料庫系統這兩套都安裝同一個虛擬機上。</p>
+
+<p>但在 Container 上，就不建議這樣的作法，比較建議用 <code class="language-plaintext highlighter-rouge">docker network</code> 建立一個 Docker 網路，然後再把這兩套軟體分別啟動為獨立的 Container，同時在 <code class="language-plaintext highlighter-rouge">docker run</code> 的時候，利用 <code class="language-plaintext highlighter-rouge">--net</code> 選項將這兩個 Container 加到同一個 Docker 網路之中。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 建立 nginx-a 和 nginx-b 兩個 Container 然後加入到 nginx-net 的 Docker 網路，然後 nginx-a 用 ping 指令加上 nginx-b 的 Container 名稱就可以 ping 到 nignx-b，而不用知道 nginx-b 的 IP</span>
+<span class="nv">$ </span>docker network create  nignx-net
+<span class="nv">$ </span>docker run <span class="nt">--name</span> nginx-a <span class="nt">--net</span><span class="o">=</span>nginx-net <span class="nt">-p</span> 8100:80 <span class="nt">-d</span> nignx
+<span class="nv">$ </span>docker run <span class="nt">--name</span> nginx-b <span class="nt">--net</span><span class="o">=</span>nginx-net <span class="nt">-p</span> 8101:80 <span class="nt">-d</span> nignx
+<span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span> nginx-a /bin/bash 
+
+root@e8b718be1d25:/# ping nginx-b
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/6.jpg" alt=""></p>
+
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/7.jpg" alt=""></p>
+
+<h2 id="十一查看及刪除-docker-網路">十一、查看及刪除 Docker 網路</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 可以在輸出結果的 [Containers] 項目查到已加入此 Docker 網路的 Container ID</span>
+<span class="nv">$ </span>docker network inspect &lt;Docker 網路名稱&gt;
+
+<span class="c"># 刪除 Docker 網路</span>
+<span class="nv">$ </span>docker network <span class="nb">rm</span> &lt;Docker 網路名稱&gt;
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/8.jpg" alt=""></p>
+
+<p>Docker 網路被移除後，所有已加入該 Docker 網路的 Container 都會無法再被啟動，因為它們會找不到需要的 Docker 網路可用。</p>
+
+<p>如果需要再次啟動那些 Container，只能建立一個相同名稱的 Docker 網路。</p>
+
+<h2 id="十二docker-stop-vs-docker-kill">十二、docker stop v.s. docker kill?</h2>
+<p>建議使用 <code class="language-plaintext highlighter-rouge">docker stop</code> 來關閉 Container。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker stop</code> 會讓 Container 進入標準的關機行程，也就是說會讓 Container 收到要關機的訊號，並通知各個行程進入各自的關機處理行程（像是資料同步或更新到檔案等工作）。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker kill</code> 是當遇到使用 <code class="language-plaintext highlighter-rouge">docker stop</code> 關閉不了，需要強制關閉的狀況時來使用。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker stop &lt;Container 名稱或 ID&gt;
+
+<span class="nv">$ </span>docker <span class="nb">kill</span> &lt;Container 名稱或 ID&gt;
+</code></pre></div></div>
+
+<h2 id="十三當運行中的軟體推出新版本時如何升級">十三、當運行中的軟體推出新版本時，如何升級？</h2>
+<p>更新的方式就是下載最新版的 Docker Image，然後再重新啟動新的 Container 就好。</p>
+
+<p>更新過程中會有 Container 停止和重新啟動的需要，所以在更新之前要先規劃及準備好所需資料。</p>
+
+<p>有些事項要特別注意，才可以做到只下載新版 <code class="language-plaintext highlighter-rouge">docker image</code> 和用 <code class="language-plaintext highlighter-rouge">docker run</code> 重新啟動 Container 就可以完成更新的做法：<br>
+(1) 不要在 Container 內儲存任何資料和設定<br>
+(2) 要記下啟動 Container 時所使用的 <code class="language-plaintext highlighter-rouge">docker run</code> 指令和選項及參數</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 檢視或備份運行中的 Container 資訊</span>
+<span class="nv">$ </span>docker inspect &lt;Container 名稱或 ID&gt;
+
+<span class="c"># 取回最新版的 Docker Image</span>
+<span class="nv">$ </span>docker pull &lt;Image 名稱&gt;
+
+<span class="c"># 停止運行中的 Container</span>
+docker stop &lt;Container 名稱或 ID&gt;
+
+<span class="c"># 移除 Container</span>
+docker <span class="nb">rm</span> &lt;Container 名稱或 ID&gt;
+
+<span class="c"># 重新啟動 Container</span>
+docker run &lt;原來的選項與參數&gt;
+</code></pre></div></div>
+<h2 id="十四建立專用-data-volume-儲存資料">十四、建立專用 Data Volume 儲存資料</h2>
+<blockquote class="prompt-info">
+  <p>除了用 <code class="language-plaintext highlighter-rouge">docker run -v</code> 和 <code class="language-plaintext highlighter-rouge">docker volume</code> 來建立 Data volume，也可以使用 docker-compose 指令搭配 docker-compose.yml 檔案新增 Data volume。</p>
+</blockquote>
+
+<p>用 <code class="language-plaintext highlighter-rouge">docker run -v</code> 可以直接從主機存取 Container 的檔案，但是容易發生權限的問題，無法順利存取。<br>
+另一個方法是可以透過建立 Docker Data volume 永久性存放 Container 的資料，還可以”共用”或”回收”。</p>
+
+<h3 id="1-docker-run--v-自動建立的-data-volume">(1) docker run -v 自動建立的 Data volume</h3>
+<p>沒有指定外部資料夾的路徑，而是直接指定該 Container 的 /usr/share/nginx/html 資料夾要掛載外部的 Data volume。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker run</code> 會在啟動 Container 時，立即建立一組 Data volume，並掛載此 Data volume 至 Container 的 /usr/share/nginx/html 資料夾路徑上，同時，還會自動把該資料夾內的檔案複製到此新建的 Data Volume 裡。</p>
+
+<p>用這方式建立的 Data volume 名稱是隨機的，不過可以使用 <code class="language-plaintext highlighter-rouge">docker inspect &lt;Container 名稱或 ID&gt;</code> 來查詢。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">-v</span> /usr/share/nginx/html <span class="nt">--name</span><span class="o">=</span>nginx-vol <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看該 Container 的 Data volume</span>
+<span class="nv">$ </span>docker volume <span class="nb">ls</span> 
+
+<span class="c"># 使用 docker inspect 找出自動建立的 Data volume 的名稱（用 docker run -v 建立的 Data volume 無法命名）</span>
+<span class="nv">$ </span>docker inspect <span class="nt">--format</span><span class="o">=</span><span class="s1">'{{json .Mounts}}'</span> nginx-vol
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/9.jpg" alt=""><br>
+<code class="language-plaintext highlighter-rouge">Name</code>: 新建的 Data Volume 名稱。<br>
+<code class="language-plaintext highlighter-rouge">Source</code>: Data volume 在主機的實際位址和路徑。</p>
+
+<h3 id="2-docker-volume-create-建立的-data-volume">(2) docker volume create 建立的 Data volume</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker volume create &lt;volume 名稱&gt;
+
+<span class="c"># 建立名叫 nginx-html 的 data volume</span>
+<span class="nv">$ </span>docker volume create nginx-html
+
+<span class="c"># 查看一下剛剛建立的 Data volume</span>
+<span class="nv">$ </span>docker volume <span class="nb">ls</span> 
+
+<span class="c"># 將 docker volume create 建立的 Data volume 掛載到新啟動的 Container 的 /usr/share/nginx/html 上</span>
+<span class="nv">$ </span>docker run <span class="nt">-v</span> nginx-html:/usr/html/nginx/html <span class="nt">--name</span> nginx-vol <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+</code></pre></div></div>
+<p>可以將這個 Data volume 同時共用到其他 Container 上面，指令跟上面一樣。</p>
+
+<p>不過共用的話要考量到”共用讀寫”同一檔案的問題，如果多個 Container 共用一個 Data volume 最好還是以不會共同更新同一個檔案的前題為原則，以免資料混亂或錯誤。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">-v</span> nginx-html:/usr/html/nginx/html <span class="nt">--name</span> nginx-vol2 <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+</code></pre></div></div>
+
+<h3 id="3-查看-docker-data-volume-的詳細資訊">(3) 查看 Docker Data volume 的詳細資訊</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker volume inspect &lt;volume 名稱&gt;
+
+<span class="nv">$ </span>docker volume inspect nginx-html
+</code></pre></div></div>
+<p><img src="/assets/images/2022-05-30-Advanced-Docker-Operations-19/10.jpg" alt=""></p>
+
+<h3 id="4-刪除-docker-data-volume">(4) 刪除 Docker Data volume</h3>
+<p>Data volume 不會自動被刪除，必須要手動操作刪除指令，<br>
+且必須刪除綁著此 Data volume 的 Container 才能刪除該 Data volume。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker volume <span class="nb">rm</span> &lt;Data volume 名稱&gt;
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li>Docker 這樣學才有趣：從入門，到玩直播、挖礦</li>
+</ul>
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/docker/2022/05/28/Docker-Command-18.html" title="Docker 基本指令">
+          <div>Docker 基本指令</div>
+        </a><a class="next" href="/nginx/2022/05/31/Nginx-conf-20.html" title="Nginx.conf 的結構">
+          <div>Nginx.conf 的結構</div>
+        </a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li class="">
+          <a class="post-link" href="/markdown/2018/05/26/mathjax-test.html" title="Mathjax Test">
+            Mathjax Test<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/docker/2022/06/16/Create-docker-image-21.html" title="各種自製 Docker Image 的方法">
+            各種自製 Docker Image 的方法<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/mysql/2023/03/30/Mysql-set-error-log-30.html" title="LNMP MySQL 設定 error_log">
+            LNMP MySQL 設定 error_log<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+<li class="">
+          <a class="post-link" href="/docker/2022/07/11/Create-docker-registry-24.html" title="架設自己的 Docker Registry">
+            架設自己的 Docker Registry<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+        </li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>2022-2025 GiantFred</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,2031 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-05-12T00:32:03+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">GiantFred’s Blog</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><author><name>GiantFred</name></author><entry><title type="html">LNMP MySQL 設定 error_log</title><link href="http://localhost:4000/mysql/2023/03/30/Mysql-set-error-log-30.html" rel="alternate" type="text/html" title="LNMP MySQL 設定 error_log" /><published>2023-03-30T00:00:00+08:00</published><updated>2023-03-30T00:00:00+08:00</updated><id>http://localhost:4000/mysql/2023/03/30/Mysql-set-error-log-30</id><content type="html" xml:base="http://localhost:4000/mysql/2023/03/30/Mysql-set-error-log-30.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>mysql  Ver 8.0.13</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一設定-error_log-遇到問題">一、設定 error_log 遇到問題</h2>
+<p>如果 LNMP 安裝的 MySQL 在 <code class="language-plaintext highlighter-rouge">/etc/my.cnf</code> 當中設定 <code class="language-plaintext highlighter-rouge">log_error=/var/log/mysql/error.log</code>，會遇到以下錯誤且無法重新啟動成功。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql.serviceJob <span class="k">for </span>mysql.service failed because the control process exited with error code. See <span class="s2">"systemctl status mysql.service"</span> and <span class="s2">"journalctl -xe"</span> <span class="k">for </span>details.
+</code></pre></div></div>
+
+<p>因為 LNMP 在安裝 MySQL 時，會在系統中新增 mysql 的使用者與群組，並用這組權限來控制資料庫。</p>
+
+<p>但是在 <code class="language-plaintext highlighter-rouge">/etc/my.cnf</code> 中指定的路徑權限屬於 <code class="language-plaintext highlighter-rouge">root:root</code>，在無法讀取 log 檔案的情況下，MySQL 就無法正常打開。</p>
+
+<h2 id="二error_log-設定方式">二、error_log 設定方式</h2>
+<h3 id="1-先新增-mysql-的-log-檔案">1. 先新增 MySQL 的 log 檔案</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">touch</span> /var/log/mysql/error.log
+</code></pre></div></div>
+
+<h3 id="2-將-varlogmysql-及其下資料夾和檔案的權限設定為-mysqlmysql">2. 將 <code class="language-plaintext highlighter-rouge">/var/log/mysql</code> 及其下資料夾和檔案的權限設定為 <code class="language-plaintext highlighter-rouge">mysql:mysql</code></h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">chown</span> <span class="nt">-R</span> mysql:mysql /var/log/mysql
+</code></pre></div></div>
+
+<h3 id="3-設定-etcmysql">3. 設定 /etc/mysql</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/my.cnf
+
+<span class="o">[</span>mysqld]
+<span class="nv">log_error</span><span class="o">=</span>/var/log/mysql/error.log
+</code></pre></div></div>
+
+<h3 id="4-重新啟動-mysql">4. 重新啟動 mysql</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>lnmp restart mysql
+</code></pre></div></div>
+
+<h3 id="5-確認設定成功">5. 確認設定成功</h3>
+<p>error_log 設定完成後，可以看看 log 第一行有沒有啟動訊息。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2022-12-15T09:53:24.789020Z 0 [System] [MY-010116] [Server] /usr/local/mysql/bin/mysqld (mysqld 8.0.13) starting as process 21119
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://huanyichuang.com/blog/lnmp-failed-to-restart-mysql-after-editing-my-cnf/">LNMP 設定 MySQL 的錯誤日誌</a></li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="MySQL" /><category term="MySQL" /><summary type="html"><![CDATA[使用的環境]]></summary></entry><entry><title type="html">將 Jitsi meet 架設在 Azure 雲端上</title><link href="http://localhost:4000/ubuntu/azure/2023/01/10/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30.html" rel="alternate" type="text/html" title="將 Jitsi meet 架設在 Azure 雲端上" /><published>2023-01-10T00:00:00+08:00</published><updated>2023-01-10T00:00:00+08:00</updated><id>http://localhost:4000/ubuntu/azure/2023/01/10/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30</id><content type="html" xml:base="http://localhost:4000/ubuntu/azure/2023/01/10/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ubuntu-20.04</td>
+    </tr>
+    <tr>
+      <td>nginx/1.18.0</td>
+    </tr>
+    <tr>
+      <td>openjdk 11.0.17</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote class="prompt-info">
+  <p>嗨。</p>
+</blockquote>
+
+<h2 id="一jitsi-meet-介紹">一、Jitsi Meet 介紹</h2>
+<h3 id="1-jitsi-meet-是什麼">1. Jitsi Meet 是什麼？</h3>
+<p>Jitsi 是免費且開源的視訊會議程式，支援多種語言，使用網頁就可以操作所有功能，無須安裝任何東西。</p>
+
+<p>自行架設的話則包含 server 和 client 端，client 端包含了網頁瀏覽器、手機 app 等介面。</p>
+
+<h3 id="2-誰適合使用">2. 誰適合使用？</h3>
+<p>適合不想付費、註冊會員、下載或安裝軟體，或是想要長時間開啟視訊會議的人。</p>
+
+<h2 id="二azure-建立新機器資訊">二、Azure 建立新機器資訊</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>設定資訊</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>作業系統</td>
+      <td>Ubuntu 20.04</td>
+    </tr>
+    <tr>
+      <td>規格</td>
+      <td>Standard B2s (2 vcpu，4 GiB 記憶體)</td>
+    </tr>
+    <tr>
+      <td>資源群組</td>
+      <td>jitsi</td>
+    </tr>
+    <tr>
+      <td>電腦名稱</td>
+      <td>美國東部2 East US 2</td>
+    </tr>
+    <tr>
+      <td>DNS名稱標籤</td>
+      <td>80,443,10000,22,3478,5349</td>
+    </tr>
+    <tr>
+      <td>SSH登入指令</td>
+      <td>ssh username@jitsi.eastus2.cloudapp.azure.com</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="三azure-開新機器及圖片介紹">三、Azure 開新機器及圖片介紹</h2>
+<ol>
+  <li>
+    <p>建立資源，選擇 Ubuntu Server 20.04 tls。<br />
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/1.jpg" alt="" /></p>
+  </li>
+  <li>
+    <p>自訂資源群組名稱、機器名稱，並選擇區域。<br />
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/2.jpg" alt="" /></p>
+  </li>
+  <li>
+    <p>選擇機器大小，設定登入金鑰或密碼，對外 port 勾選 <code class="language-plaintext highlighter-rouge">[80,443,22]</code>，再按下左下角的<code class="language-plaintext highlighter-rouge">檢閱+建立</code>，建立新機器。<br />
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/3.jpg" alt="" /></p>
+  </li>
+  <li>
+    <p>在<strong>網路</strong>新增 Jitst 所需的 port<code class="language-plaintext highlighter-rouge">[80,443,10000,22,3478,5349]</code>，並命名為<code class="language-plaintext highlighter-rouge">port_jitsi</code>，前面已經設定過 80,443,22 了，現在又再設定一次是為了集中管理 Jitsi 所需的 port，實際上不影響。 <br />
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/4.jpg" alt="" /></p>
+  </li>
+  <li>
+    <p>再<strong>組態</strong>設定 DNS 名稱標籤。
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/5.jpg" alt="" /></p>
+  </li>
+  <li>
+    <p>設定皆完成，可以開始連線至機器囉。
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/6.jpg" alt="" /></p>
+  </li>
+</ol>
+
+<h2 id="四ssh-連線至機器">四、SSH 連線至機器</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh username@jitsi.eastus2.cloudapp.azure.com
+</code></pre></div></div>
+
+<h2 id="五安裝-jitsi-所需要的工具">五、安裝 Jitsi 所需要的工具</h2>
+
+<h3 id="1-需要的工具">1. 需要的工具</h3>
+<ul>
+  <li>gnupg2</li>
+  <li>nginx-full</li>
+  <li>sudo =&gt; Only needed if you use sudo</li>
+  <li>curl =&gt; Or wget to Add the Jitsi package repository</li>
+  <li>OpenJDK 11 must be used.</li>
+</ul>
+
+<h3 id="2-把需要的工具安裝起來">2. 把需要的工具安裝起來</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo</span> <span class="nt">-s</span> 
+<span class="nv">$ </span>apt update <span class="nt">-y</span>
+<span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> apt-transport-https
+<span class="nv">$ </span>apt-add-repository universe <span class="c"># jisti需要</span>
+<span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> gnupg2
+<span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> nginx
+<span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> openjdk-11-jdk
+
+<span class="c"># sudo 跟 curl 原本就有所以沒裝</span>
+</code></pre></div></div>
+
+<h3 id="3--檢查是否有安裝完成">3.  檢查是否有安裝完成</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nginx <span class="nt">-V</span>
+<span class="nv">$ </span>java <span class="nt">--version</span>
+<span class="nv">$ </span><span class="nb">sudo</span> <span class="nt">-V</span>
+<span class="nv">$ </span>curl <span class="nt">-V</span>
+</code></pre></div></div>
+
+<h2 id="六-編輯-etchosts">六、 編輯 /etc/hosts</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/hosts
+x.x.x.x myjitsi.test123.com myjitsi
+<span class="c"># x.x.x.x 是本機IP，myjitsi.test123.com 是自訂的域名，後面的 myjitsi 是電腦名稱</span>
+
+<span class="c"># 重開機吃設定</span>
+<span class="nv">$ </span>reboot 
+</code></pre></div></div>
+
+<h2 id="七-add-the-prosody-package-repository">七、 Add the Prosody package repository</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo </span>deb http://packages.prosody.im/debian <span class="si">$(</span>lsb_release <span class="nt">-sc</span><span class="si">)</span> main | <span class="nb">sudo tee</span> <span class="nt">-a</span> /etc/apt/sources.list
+<span class="nv">$ </span>wget https://prosody.im/files/prosody-debian-packages.key <span class="nt">-O-</span> | <span class="nb">sudo </span>apt-key add -
+<span class="nv">$ </span>apt <span class="nb">install </span>lua5.2
+</code></pre></div></div>
+
+<h2 id="八-add-the-jitsi-package-repository">八、 Add the Jitsi package repository</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl https://download.jitsi.org/jitsi-key.gpg.key | <span class="nb">sudo </span>sh <span class="nt">-c</span> <span class="s1">'gpg --dearmor &gt; /usr/share/keyrings/jitsi-keyring.gpg'</span>
+<span class="nv">$ </span><span class="nb">echo</span> <span class="s1">'deb [signed-by=/usr/share/keyrings/jitsi-keyring.gpg] https://download.jitsi.org stable/'</span> | <span class="nb">sudo tee</span> /etc/apt/sources.list.d/jitsi-stable.list <span class="o">&gt;</span> /dev/null
+<span class="nv">$ </span>apt update
+</code></pre></div></div>
+
+<h2 id="九-設定防火牆">九、 設定防火牆</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ufw allow 80/tcp
+<span class="nv">$ </span>ufw allow 443/tcp
+<span class="nv">$ </span>ufw allow 10000/udp
+<span class="nv">$ </span>ufw allow 22/tcp
+<span class="nv">$ </span>ufw allow 3478/udp
+<span class="nv">$ </span>ufw allow 5349/tcp
+<span class="nv">$ </span>ufw <span class="nb">enable</span> <span class="c"># 啟動 ufw</span>
+<span class="nv">$ </span>ufw status verbose <span class="c"># 查看 ufw 狀態</span>
+</code></pre></div></div>
+
+<h2 id="十-安裝-jitsi">十、 安裝 jitsi</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> jitsi-meet
+</code></pre></div></div>
+
+<p>安裝過程會詢問的問題：</p>
+<ol>
+  <li>域名要哪個？—— myjitsi.test123.com</li>
+  <li>SSl 憑證要用哪個？—— Let’s Encrypt Certificate</li>
+  <li>輸入Email(SSL用)—— username@gmail.com</li>
+  <li>Add telephony to your Jitsi meetings?—— no</li>
+</ol>
+
+<h2 id="十一-在瀏覽器輸入網址">十一、 在瀏覽器輸入網址</h2>
+<p>myjitsi.test123.com<br />
+進入網站後即可開始使用基本的 Jitsi。
+<img src="/assets/images/2023-01-10-Setup-Jitsi-Meet-Server-on-Azure-30/7.jpg" alt="" /></p>
+
+<p>大功告成！</p>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://meet.jit.si/">jitsi</a></li>
+  <li><a href="https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart">Self-Hosting Guide - Debian/Ubuntu server</a></li>
+  <li><a href="https://technologyrss.com/how-to-install-jitsi-own-server-for-video-conference-on-ubuntu-20-04/">How To Install Jitsi Own Server For Video Conference On Ubuntu 20.04</a></li>
+  <li><a href="https://www.playpcesor.com/2020/04/jitsi-meet.html">Jitsi Meet 視訊會議教學：免費無限時間、共享桌面、會議錄影</a></li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="Ubuntu" /><category term="Azure" /><category term="ubuntu" /><category term="nginx" /><category term="jitsi" /><summary type="html"><![CDATA[使用的環境]]></summary></entry><entry><title type="html">Nginx 限制請求的速度</title><link href="http://localhost:4000/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29.html" rel="alternate" type="text/html" title="Nginx 限制請求的速度" /><published>2022-12-20T00:00:00+08:00</published><updated>2022-12-20T00:00:00+08:00</updated><id>http://localhost:4000/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29</id><content type="html" xml:base="http://localhost:4000/nginx/2022/12/20/2022-12-20-Nginx-http-limit-req-module-29.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>nginx/1.16.1</td>
+    </tr>
+    <tr>
+      <td>Naxsi 1.3</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一ngx_http_limit_req_module-寫法介紹">一、ngx_http_limit_req_module 寫法介紹</h2>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 保存 10MB 的 ip 的 request 紀錄，每分鐘可以接受 100 個 request。
+</span><span class="n">limit_req_zone</span> $<span class="n">binary_remote_addr</span> <span class="n">zone</span>=<span class="n">mylimit</span>:<span class="m">10</span><span class="n">m</span> <span class="n">rate</span>=<span class="m">100</span><span class="n">r</span>/<span class="n">m</span>;
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">$binary_remote_addr</code> 指的是 client 端的 IP，根據 client 端的 IP 進行限流。</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">zone=mylimit:10m</code> limiter(zone) 叫做 mylimit，並且最多可以使用 10MB 的儲存空間來儲存每個 IP 的請求次數（10MB 可以存十幾萬個 IP）。</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">rate=100r/m</code> 每分鐘一百個請求。但要注意的是 nginx 會幫你換算成多少毫秒可以接受一個新請求，譬如說每分鐘一百個，就會幫你換算成 600 毫秒一個請求，因此如果你在 600 毫秒內同時發了十個請求，那就只有第一個會被接受，其他九個都會直接被拒絕掉。</p>
+  </li>
+</ul>
+
+<h2 id="二nginxconf-設定">二、Nginx.conf 設定</h2>
+<blockquote class="prompt-warning">
+  <p>如果要真實 IP 可以把 <code class="language-plaintext highlighter-rouge">$binary_remote_addr</code>換成<code class="language-plaintext highlighter-rouge">$http_x_forwarded_for</code>，除了<code class="language-plaintext highlighter-rouge">remote_addr</code>，<code class="language-plaintext highlighter-rouge">HTTP_CLIENT_IP</code>和<code class="language-plaintext highlighter-rouge">http_x_forwarded_for</code>可以被偽造。<br />
+<code class="language-plaintext highlighter-rouge">remote_addr</code>雖然可以取得安全可靠的 IP，但無法確定它是否為使用者真正的IP。</p>
+</blockquote>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">http</span>
+    {
+      <span class="n">limit_req_zone</span> $<span class="n">binary_remote_addr</span>  <span class="n">zone</span>=<span class="n">mylimit</span>:<span class="m">1</span><span class="n">m</span> <span class="n">rate</span>=<span class="m">2</span><span class="n">r</span>/<span class="n">s</span>;
+    }
+</code></pre></div></div>
+
+<h2 id="三vhostconf-設定">三、Vhost.conf 設定</h2>
+<p>去網址的 conf 檔設定，可設定 location 路徑再套用限速規則。</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">location</span> /<span class="n">login</span>
+    {
+       <span class="n">limit_req</span> <span class="n">zone</span>=<span class="n">mylimit</span>;
+    }
+</code></pre></div></div>
+
+<h2 id="四-reload-nginx">四、 reload Nginx</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nginx <span class="nt">-s</span> reload
+</code></pre></div></div>
+
+<h2 id="五查看是否有設定成功">五、查看是否有設定成功</h2>
+<p>去網站狂按 F5，看會不會出現 503，意思是「流量過大或正在維修」，有的話即為設定成功。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>503  Service Temporarily Unavailable 
+</code></pre></div></div>
+<p><img src="/assets/images/2022-12-20-Nginx-http-limit-req-module-29/1.jpg" alt="" /></p>
+
+<h2 id="六額外也可以一次宣告多個-zone">六、額外：也可以一次宣告多個 zone</h2>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 也可以一次宣告多個 zone
+</span><span class="n">http</span> {
+    <span class="n">limit_req_zone</span> $<span class="n">binary_remote_addr</span> <span class="n">zone</span>=<span class="n">limit_verifyPhone</span>:<span class="m">10</span><span class="n">m</span> <span class="n">rate</span>=<span class="m">2</span><span class="n">r</span>/<span class="n">m</span>;
+    <span class="n">limit_req_zone</span> $<span class="n">binary_remote_addr</span> <span class="n">zone</span>=<span class="n">limit_resetPassword</span>:<span class="m">10</span><span class="n">m</span> <span class="n">rate</span>=<span class="m">1</span><span class="n">r</span>/<span class="n">m</span>;
+
+
+    <span class="n">server</span> {
+    <span class="c"># 也可以套用在 POST 請求上
+</span>          <span class="n">location</span> /<span class="n">api</span>/<span class="n">verifyPhone</span> 
+      {
+                <span class="n">limit_req</span> <span class="n">zone</span>=<span class="n">limit_verifyPhone</span>;
+              <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="n">backend</span>;
+         }    
+        <span class="n">location</span> /<span class="n">api</span>/<span class="n">resetPassword</span> 
+    {
+              <span class="n">limit_req</span> <span class="n">zone</span>=<span class="n">limit_resetPassword</span>;
+             <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="n">backend</span>;
+            }
+     }
+}
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://nginx.org/en/docs/http/ngx_http_limit_req_module.html">Module ngx_http_limit_req_module</a></li>
+  <li><a href="https://code.yidas.com/nginx-ngx_http_limit_req_module/">[Web] Nginx limit_req 指南 – ngx_http_limit_req_module</a></li>
+  <li><a href="https://medium.com/evan-fang/nginx-rate-limiting-%E4%BD%BF%E7%94%A8limit-req-zone%E4%BE%86%E9%99%90%E5%88%B6request%E9%87%8F-f72936ebbbac">NGINX Rate Limiting: 使用limit_req_zone來限制request量</a></li>
+  <li><a href="https://ithelp.ithome.com.tw/articles/10270993?sc=iThelpR">Day09-流量限制（四）</a></li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="Nginx" /><category term="nginx" /><category term="limit" /><category term="module" /><summary type="html"><![CDATA[使用的環境]]></summary></entry><entry><title type="html">閱讀心得(4)：強大內心的自我對話習慣</title><link href="http://localhost:4000/review/2022/11/29/Book-review-4-28.html" rel="alternate" type="text/html" title="閱讀心得(4)：強大內心的自我對話習慣" /><published>2022-11-29T00:00:00+08:00</published><updated>2022-11-29T00:00:00+08:00</updated><id>http://localhost:4000/review/2022/11/29/Book-review-4-28</id><content type="html" xml:base="http://localhost:4000/review/2022/11/29/Book-review-4-28.html"><![CDATA[<p><strong>書名：</strong>強大內心的自我對話習慣  <br />
+<strong>作者：</strong>伊森．克洛斯<br />
+<strong>譯者：</strong>胡宗香<br />
+<strong>出版社：</strong>天下雜誌股份有限公司<br />
+<strong>出版日期：</strong>2021/05/26</p>
+
+<hr />
+
+<p><img src="/assets/images/2022-11-29-Review-閱讀心得-4-強大內心的自我對話習慣-28/1.jpg" alt="" /></p>
+
+<hr />
+
+<p><strong>閱讀心得：</strong></p>
+
+<p>　　這本書提到我們的思緒會出現「內在聲音」、「小對話」，「內在聲音」是人腦中跟自己私下對話的聲音，形式和表現因人而異；而「小對話」是負面想法和情緒構成的循環，會危及我們的表現、決策能力、人際關係、快樂與健康。</p>
+
+<p>　　小對話發生時，我們會感覺到被心智折磨，讓我們的思想及行為癱瘓，甚至做出傷害自己的事情。</p>
+
+<p>　　為了不被負面情緒綁架，本書也提供一些方式解決，包括自己可以實踐的對抗工具、依靠他人協助的對抗工具，或者周遭環境中的對抗工具。在這邊就不全部都列出，只列出我最喜歡的幾個：</p>
+
+<ol>
+  <li>
+    <p>使用抽離式自我對話：使用自己的名字或是第二人稱「你」來稱呼自己，這樣可以讓大腦不停回想事件的活躍度降低，提升壓力下的表現，讓思考更明智，減少負面情緒。</p>
+  </li>
+  <li>
+    <p>以書寫表達：每天花費十五分鐘寫下有關負面經驗最深刻的想法與感受，從敘事者觀點看待自己的經驗，拉開與這個經驗的距離，有助於釐清自己的感受。</p>
+  </li>
+  <li>
+    <p>投入引發敬畏感的體驗：升起敬畏感，能讓我們超越當下的憂慮，把自己的問題放在更大的格局中觀察，可以是看到壯麗景觀，也可以是凝視一件出色的藝術品。找出能讓人充滿敬畏感的事物，就會感到自己的渺小，而你的問題根本微不足道。</p>
+  </li>
+</ol>
+
+<p>　　這本書提供了很多有效且令我想實踐的方式，但是內文偏少，而參考資料佔了整本書的四分之一，在看完正文時，整個人霧煞煞，想說為什麼還這麼多頁，不過這也代表作者在撰寫這本書時，參考及引用了大量的學術文章，讓我們知道這些理論或方式不是憑空出現的。</p>]]></content><author><name>GiantFred</name></author><category term="Review" /><category term="book" /><category term="review" /><summary type="html"><![CDATA[聆聽自己，強大自己。]]></summary></entry><entry><title type="html">哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能</title><link href="http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html" rel="alternate" type="text/html" title="哇虎！使用 Nginx 的 Naxsi 模組實現 WAF 功能" /><published>2022-10-13T00:00:00+08:00</published><updated>2022-10-13T00:00:00+08:00</updated><id>http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27</id><content type="html" xml:base="http://localhost:4000/nginx/2022/10/13/2022-10-13-Nginx-Naxsi-module-27.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>nginx/1.16.1</td>
+    </tr>
+    <tr>
+      <td>Naxsi 1.3</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一waf-介紹">一、WAF 介紹</h2>
+<p>WAF（Web Application Firewall，網站應用程式防火牆），主要為保護網站應用程式，透過監控及過濾 HTTP/HTTPS 請求來分析網路行為，拒絕可疑、惡意流量進入網站，只讓安全且正常的流量通過。</p>
+
+<p>只能即時保護應用程式，不能修復漏洞，但在防禦的同時，可以有緩衝時間修復應用程式的漏洞。</p>
+
+<p>方式：依據事先設計好的安全政策，發掘違反安全政策的封包。<br />
+目的：保護 web 應用程式，防禦 XSS 及 SQL injection 等攻擊。</p>
+
+<ul>
+  <li>支持 POST/GET</li>
+  <li>位於網頁瀏覽者與網頁伺服器中間，專責分析與過濾 「Layer7 應用層」 的網路流量</li>
+  <li>有些更強大的甚至可以掃描惡意木馬文件、防竄改、伺服器優化、備份</li>
+  <li>如果網站有蒐集 cookie、用戶資料、表單紀錄，建議使用 WAF</li>
+</ul>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/WAF.jpg" alt="" />
+ （圖片來源：cloudmax 部落格）</p>
+
+<h2 id="二waf-優缺點">二、WAF 優缺點</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>優點</th>
+      <th>缺點</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. 開箱即用</td>
+      <td>1. 誤殺、漏報</td>
+    </tr>
+    <tr>
+      <td>2. 管理方便，介面友好</td>
+      <td>2. 只適合中小型網站</td>
+    </tr>
+    <tr>
+      <td>3. 功能豐富</td>
+      <td>3. 必須客製化規則才能有效的抵擋攻擊</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>4. 功能強大的 WAF 很貴</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="三naxsi-模組介紹">三、Naxsi 模組介紹</h2>
+<p>Naxsi 是 Nginx 的第三方模組，與任何 Nginx 版本都相容，採用 GPLv3 授權，可以免費使用，也不需要依賴類似防毒軟體的病毒碼資料庫。</p>
+
+<p>可以建置簡易的 WAF 系統，阻擋一些常見的 Nginx Anti XSS 及 SQL Injection 攻擊，但只能過濾「GET」及「POST」的請求。</p>
+
+<h2 id="四naxsi-的規則檔-naxsi_corerules">四、Naxsi 的規則檔 naxsi_core.rules</h2>
+
+<p>舉例 naxsi_core.rules 內的部份規則：</p>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##################################
+## SQL Injections IDs:1000-1099 ##
+##################################
+</span><span class="n">MainRule</span> <span class="s2">"rx:select|union|update|delete|insert|table|from|ascii|hex|unhex|drop|load_file|substr|group_concat|dumpfile"</span> <span class="s2">"msg:sql keywords"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1000</span>;
+<span class="n">MainRule</span> <span class="s2">"str:\"" "</span><span class="n">msg</span>:<span class="n">double</span> <span class="n">quote</span><span class="s2">" "</span><span class="n">mz</span>:<span class="n">BODY</span>|<span class="n">URL</span>|<span class="n">ARGS</span>|$<span class="n">HEADERS_VAR</span>:<span class="n">Cookie</span><span class="s2">" "</span><span class="n">s</span>:$<span class="n">SQL</span>:<span class="m">8</span>,$<span class="n">XSS</span>:<span class="m">8</span><span class="err">"</span> <span class="n">id</span>:<span class="m">1001</span>;
+<span class="n">MainRule</span> <span class="s2">"str:0x"</span> <span class="s2">"msg:0x, possible hex encoding"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:2"</span> <span class="n">id</span>:<span class="m">1002</span>;
+<span class="c">## Hardcore rules
+</span><span class="n">MainRule</span> <span class="s2">"str:/*"</span> <span class="s2">"msg:mysql comment (/*)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1003</span>;
+<span class="n">MainRule</span> <span class="s2">"str:*/"</span> <span class="s2">"msg:mysql comment (*/)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1004</span>;
+<span class="n">MainRule</span> <span class="s2">"str:|"</span> <span class="s2">"msg:mysql keyword (|)"</span>  <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1005</span>;
+<span class="n">MainRule</span> <span class="s2">"str:&amp;&amp;"</span> <span class="s2">"msg:mysql keyword (&amp;&amp;)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:8"</span> <span class="n">id</span>:<span class="m">1006</span>;
+<span class="c">## end of hardcore rules
+</span><span class="n">MainRule</span> <span class="s2">"str:--"</span> <span class="s2">"msg:mysql comment (--)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1007</span>;
+<span class="n">MainRule</span> <span class="s2">"str:;"</span> <span class="s2">"msg:semicolon"</span> <span class="s2">"mz:BODY|URL|ARGS"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1008</span>;
+<span class="n">MainRule</span> <span class="s2">"str:="</span> <span class="s2">"msg:equal sign in var, probable sql/xss"</span> <span class="s2">"mz:ARGS|BODY"</span> <span class="s2">"s:$SQL:2"</span> <span class="n">id</span>:<span class="m">1009</span>;
+<span class="n">MainRule</span> <span class="s2">"str:("</span> <span class="s2">"msg:open parenthesis, probable sql/xss"</span> <span class="s2">"mz:ARGS|URL|BODY|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1010</span>;
+<span class="n">MainRule</span> <span class="s2">"str:)"</span> <span class="s2">"msg:close parenthesis, probable sql/xss"</span> <span class="s2">"mz:ARGS|URL|BODY|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1011</span>;
+<span class="n">MainRule</span> <span class="s2">"str:'"</span> <span class="s2">"msg:simple quote"</span> <span class="s2">"mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4,$XSS:8"</span> <span class="n">id</span>:<span class="m">1013</span>;
+<span class="n">MainRule</span> <span class="s2">"str:,"</span> <span class="s2">"msg:comma"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1015</span>;
+<span class="n">MainRule</span> <span class="s2">"str:#"</span> <span class="s2">"msg:mysql comment (#)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1016</span>;
+<span class="n">MainRule</span> <span class="s2">"str:@@"</span> <span class="s2">"msg:double arobase (@@)"</span> <span class="s2">"mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$SQL:4"</span> <span class="n">id</span>:<span class="m">1017</span>;
+</code></pre></div></div>
+
+<h2 id="五naxsi-規則與攔截分數介紹">五、Naxsi 規則與攔截分數介紹</h2>
+<h3 id="1-規則解說與計分方式">1. 規則解說與計分方式</h3>
+
+<blockquote class="prompt-info">
+  <p>這是 <code class="language-plaintext highlighter-rouge">naxsi_core.rules</code> 內的部份規則。</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>規則</th>
+      <th>規則解說</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>id 為 1001 的規則</td>
+      <td><code class="language-plaintext highlighter-rouge">MainRule "str:\"" "msg:double quote" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:8,$XSS:8" id:1001;</code> <br /> 表示如果在請求體(BODY)，統一資源定位符(URL)，請求參數(ARGS)，請求標題(Cookie)任何地方出現了雙引號(")，就表示該請求可能是 SQL 注入或是 XSS 攻擊，判斷分數皆為 8。</td>
+    </tr>
+    <tr>
+      <td>id 為 1002 的規則表示</td>
+      <td><code class="language-plaintext highlighter-rouge">MainRule "str:0x" "msg:0x, possible hex encoding" "mz:BODY|URL|ARGS|$HEADERS_VAR:Cookie" "s:$SQL:2" id:1002;</code> <br /> 表示如果在請求體(BODY)，統一資源定位符(URL)，請求參數(ARGS)，請求標題(Cookie)任何地方出現了雙引號(")，就表示該請求可能是 SQL 注入或是 XSS 攻擊，判斷分數皆為 2。</td>
+    </tr>
+    <tr>
+      <td>id 為 1013 的規則表示</td>
+      <td><code class="language-plaintext highlighter-rouge">MainRule "str:'" "msg:simple quote" "mz:ARGS|BODY|URL|$HEADERS_VAR:Cookie" "s:$SQL:4,$XSS:8" id:1013;</code> <br /> 表示如果在請求體(BODY)，統一資源定位符(URL)，請求參數(ARGS)，請求標題(Cookie)任何地方出現了單引號(’)，就表示該請求可能是 SQL 注入或是 XSS 攻擊，判斷分數為 4 跟 8。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="2-攔截分數建立網站防護規則">2. 攔截分數（建立網站防護規則）</h3>
+
+<blockquote class="prompt-info">
+  <p>這是在 <code class="language-plaintext highlighter-rouge">nginx.conf</code> 內的設定，最終分數可以自訂，一旦累積的分數到達設定的標準，就會攔截並回報錯誤，詳細設定方式底下介紹。</p>
+</blockquote>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 設定 Naxsi 何時行動，可自行調整阻擋的分數，當請求達到此分數時，請求將被拒絕
+# 以下設定為當分數累積到到 8 (或 4)後就阻擋
+</span>
+<span class="n">CheckRule</span> <span class="s2">"$SQL &gt;= 8"</span> <span class="n">BLOCK</span>;  
+<span class="n">CheckRule</span> <span class="s2">"$RFI &gt;= 8"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$TRAVERSAL &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$UPLOAD &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$XSS &gt;= 8"</span> <span class="n">BLOCK</span>;
+</code></pre></div></div>
+
+<h2 id="六安裝-naxsi-模組">六、安裝 Naxsi 模組</h2>
+
+<h3 id="1-安裝必要套件">1. 安裝必要套件</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum groupinstall <span class="s2">"development tools"</span> <span class="nt">-y</span>
+</code></pre></div></div>
+
+<h3 id="2-安裝-pcre-以及-openssl-套件">2. 安裝 PCRE 以及 openssl 套件</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>pcre pcre-devel openssl openssl-devel <span class="nt">-y</span>
+</code></pre></div></div>
+
+<h3 id="3-在想要的路徑下載-naxsi">3. 在想要的路徑下載 Naxsi</h3>
+<p>我是安裝在 <code class="language-plaintext highlighter-rouge">/usr/local/nginx_module</code> 內。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/nbs-system/naxsi.git
+</code></pre></div></div>
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/1.jpg" alt="" /></p>
+
+<h3 id="4-路徑整理">4. 路徑整理</h3>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>從 <span class="n">Github</span> 下載的 <span class="n">Naxsi</span> 位置
+/<span class="n">usr</span>/<span class="n">local</span>/<span class="n">naxsi</span>
+
+<span class="n">naxsi</span>主要資料夾
+/<span class="n">usr</span>/<span class="n">local</span>/<span class="n">naxsi</span>/<span class="n">naxsi_src</span>
+
+<span class="n">naxsi</span> 規則檔
+/<span class="n">usr</span>/<span class="n">local</span>/<span class="n">naxsi</span>/<span class="n">naxsi_config</span>/<span class="n">naxsi_core</span>.<span class="n">rules</span>
+</code></pre></div></div>
+
+<h3 id="5-編譯-nginx">5. 編譯 Nginx</h3>
+<p>要在有 configure 的那個資料夾底下編譯，模組安裝路徑可以用絕對路徑比較保險，
+使用 <code class="language-plaintext highlighter-rouge">--add-dynamic-module</code> 把 Naxsi 加進去。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./configure <span class="nt">--user</span><span class="o">=</span>www <span class="nt">--group</span><span class="o">=</span>www <span class="se">\</span>
+ <span class="nt">--prefix</span><span class="o">=</span>/usr/local/nginx <span class="se">\</span>
+ <span class="nt">--with-http_stub_status_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_ssl_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_v2_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_gzip_static_module</span> <span class="se">\</span>
+ <span class="nt">--with-http_sub_module</span> <span class="se">\</span>
+ <span class="nt">--with-stream</span> <span class="se">\</span>
+ <span class="nt">--with-stream_ssl_module</span> <span class="se">\</span>
+ <span class="nt">--with-openssl</span><span class="o">=</span>/root/lnmp1.6/src/openssl-1.1.1d <span class="se">\</span>
+ <span class="nt">--with-openssl-opt</span><span class="o">=</span>enable-weak-ssl-ciphers <span class="se">\</span>
+ <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/ngx_http_geoip2_module <span class="se">\</span>
+ <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/naxsi/naxsi_src
+
+<span class="nv">$ </span>make 
+
+<span class="c"># 有些人說不要 make install，但我用 make module 或純粹 make 都沒有用，不知道原因</span>
+<span class="nv">$ </span>make <span class="nb">install</span>
+</code></pre></div></div>
+
+<p>編譯成功後長這樣：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nginx <span class="nt">-V</span>
+
+nginx version: nginx/1.16.1
+built by gcc 4.8.5 20150623 <span class="o">(</span>Red Hat 4.8.5-44<span class="o">)</span> <span class="o">(</span>GCC<span class="o">)</span>
+built with OpenSSL 1.1.1d  10 Sep 2019
+TLS SNI support enabled
+configure arguments: <span class="nt">--user</span><span class="o">=</span>www <span class="nt">--group</span><span class="o">=</span>www <span class="nt">--prefix</span><span class="o">=</span>/usr/local/nginx <span class="nt">--with-http_stub_status_module</span> <span class="nt">--with-http_ssl_module</span> <span class="nt">--with-http_v2_module</span> <span class="nt">--with-http_gzip_static_module</span> <span class="nt">--with-http_sub_module</span> <span class="nt">--with-stream</span> <span class="nt">--with-stream_ssl_module</span> <span class="nt">--with-openssl</span><span class="o">=</span>/root/lnmp1.6/src/openssl-1.1.1d <span class="nt">--with-openssl-opt</span><span class="o">=</span>enable-weak-ssl-ciphers <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/ngx_http_geoip2_module <span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/naxsi/naxsi_src
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/2.jpg" alt="" /></p>
+
+<h3 id="6-將-naxsi-主要設定檔複製進-nginx-資料夾中">6. 將 Naxsi 主要設定檔複製進 Nginx 資料夾中</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp</span> /usr/local/nginx_module/naxsi/naxsi_config/naxsi_core.rules  /usr/local/nginx/conf
+</code></pre></div></div>
+
+<h3 id="7-新增一個-naxsi-規則檔案">7. 新增一個 Naxsi 規則檔案</h3>
+
+<p>這是上面攔截分數把他包成一個檔案 <code class="language-plaintext highlighter-rouge">naxsi_custom.rules</code>，到時候再 include 到 nginx.conf 裡面。</p>
+
+<blockquote class="prompt-info">
+  <p>底下設定在上面第 2 節有介紹。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/naxsi_custom.rules
+</code></pre></div></div>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 開啟 naxsi
+</span><span class="n">SecRulesEnabled</span>;
+
+<span class="c"># 學習模式 預設關閉
+#LearningMode; 
+</span>
+<span class="c"># 透過 libinjection 判斷 SQL 注入和 XSS 攻擊
+</span><span class="n">LibInjectionSql</span>;
+<span class="n">LibInjectionXss</span>;
+
+<span class="c"># 拒絕訪問時展示的頁面 
+</span><span class="n">DeniedUrl</span> <span class="s2">"/RequestDenied"</span>;  
+
+<span class="c"># 設定 Naxsi 何時行動，可自行調整阻擋的分數，當請求達到此分數時，請求將被拒絕
+# 以下設定為當分數累積到到 8 (或 4)後就阻擋
+</span><span class="n">CheckRule</span> <span class="s2">"$SQL &gt;= 8"</span> <span class="n">BLOCK</span>;  
+<span class="n">CheckRule</span> <span class="s2">"$RFI &gt;= 8"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$TRAVERSAL &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$UPLOAD &gt;= 4"</span> <span class="n">BLOCK</span>;
+<span class="n">CheckRule</span> <span class="s2">"$XSS &gt;= 8"</span> <span class="n">BLOCK</span>;
+
+<span class="c"># Naxsi 的 log 位置設定
+</span><span class="n">error_log</span> /<span class="n">home</span>/<span class="n">wwwlogs</span>/<span class="n">naxsi_attach</span>.<span class="n">log</span>;
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/3.jpg" alt="" /></p>
+
+<h3 id="8-開始設定">8. 開始設定</h3>
+<h4 id="1-nginxconf">(1) nginx.conf</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/nginx.conf
+</code></pre></div></div>
+
+<p>裡面設定：</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在全區塊 pid 下面新增這句：
+</span><span class="n">load_module</span> <span class="n">modules</span>/<span class="n">ngx_http_naxsi_module</span>.<span class="n">so</span>;
+
+<span class="c"># 在 http include rules
+</span><span class="n">http</span>
+  {
+    <span class="n">include</span> /<span class="n">usr</span>/<span class="n">local</span>/<span class="n">nginx</span>/<span class="n">conf</span>/<span class="n">naxsi_core</span>.<span class="n">rules</span>;
+  }
+
+
+<span class="c"># 在 server include rules
+</span><span class="n">server</span> 
+  {
+  <span class="n">location</span> /
+      {
+        <span class="n">include</span> /<span class="n">usr</span>/<span class="n">local</span>/<span class="n">nginx</span>/<span class="n">conf</span>/<span class="n">naxsi_custom</span>.<span class="n">rules</span>;
+      }
+
+  <span class="n">location</span> /<span class="n">RequestDenied</span>  <span class="c"># 要搭配上面的 DeniedUrl "/RequestDenied";
+</span>      {
+        <span class="n">return</span> <span class="m">400</span>; <span class="c"># 被阻擋後顯示錯誤 400
+</span>      }
+  }
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/4.jpg" alt="" />
+<img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/5.jpg" alt="" /></p>
+
+<h4 id="2-vhostconf">(2) vhost.conf</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/vhost/xxx.conf
+</code></pre></div></div>
+
+<p>裡面設定：</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">server</span> 
+  {
+  <span class="n">location</span> /
+      {
+        <span class="n">include</span> /<span class="n">usr</span>/<span class="n">local</span>/<span class="n">nginx</span>/<span class="n">conf</span>/<span class="n">naxsi_custom</span>.<span class="n">rules</span>;
+      }
+
+  <span class="n">location</span> /<span class="n">RequestDenied</span>  <span class="c"># 要搭配上面的 DeniedUrl "/RequestDenied";
+</span>      {
+        <span class="n">return</span> <span class="m">400</span>; <span class="c"># 被阻擋後顯示錯誤 400
+</span>      }
+  }
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/6.jpg" alt="" /></p>
+
+<h3 id="9-重新啟動或重新讀取-nginx">9. 重新啟動或重新讀取 Nginx</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 重新啟動 nginx</span>
+<span class="nv">$ </span>nginx <span class="nt">-s</span> reopen
+
+<span class="c"># 重新讀取 nginx</span>
+<span class="nv">$ </span>nginx <span class="nt">-s</span> reload
+</code></pre></div></div>
+<h2 id="七實際測試">七、實際測試</h2>
+<h3 id="1-瀏覽器上測試">1. 瀏覽器上測試</h3>
+<p>在有設定 Naxsi 的網站上面打這些 SQL 注入的請求：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://url/=&lt;&gt;
+http://url/?a=&lt;&gt;
+http://localhost/?...&lt;&gt;
+http://localhost/?id=&lt;&gt;
+</code></pre></div></div>
+<h3 id="2-主機上測試">2. 主機上測試</h3>
+<p>在終端機上面存取有設定 Naxsi 的網站：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-IL</span> <span class="s2">"http://x.x.x.x/?a=&lt;&gt;"</span>
+<span class="nv">$ </span>wget <span class="s2">"https://xxx.xxx.com/?&lt;&gt;"</span>
+</code></pre></div></div>
+
+<h2 id="八攔截成功畫面與分析">八、攔截成功畫面與分析</h2>
+
+<h3 id="1-當下攔截畫面">1. 當下攔截畫面</h3>
+<p>觀察網站收到 SQL 注入的請求後有沒有報400。</p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/7.jpg" alt="" /></p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/8.jpg" alt="" /></p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/9.jpg" alt="" /></p>
+
+<h3 id="2-攔截-log-查看">2. 攔截 log 查看</h3>
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/10.jpg" alt="" /></p>
+
+<h3 id="3-log-分析">3. log 分析</h3>
+
+<p>查看設定的 <code class="language-plaintext highlighter-rouge">naxsi_attach.log</code>，若在 log 中出現 NAXSI_FMT 開頭，就是啟用成功。  <br />
+挑 2022/10/20 17:53:37 那行 log 來當範例（IP 跟網址有改過）。</p>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">2022</span>/<span class="m">10</span>/<span class="m">20</span> <span class="m">17</span>:<span class="m">53</span>:<span class="m">37</span> [<span class="n">error</span>] <span class="m">7275</span><span class="c">#0: *5428 NAXSI_FMT: ip=223.58.42.103&amp;server=taipei.test.com&amp;uri=/=a&lt;&gt;&amp;vers=1.3&amp;total_processed=20&amp;total_blocked=3&amp;config=block&amp;cscore0=$XSS&amp;score0=8&amp;zone0=URL&amp;id0=1302&amp;var_name0=, client: 223.58.42.103, server: taipei.test.com, request: "GET /=a%3C%3E HTTP/2.0", host: "taipei.test.com"
+</span></code></pre></div></div>
+
+<p>且對應到的規則是以下兩行：</p>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">########################################
+## Cross Site Scripting IDs:1300-1399 ##
+########################################
+</span><span class="n">MainRule</span> <span class="s2">"str:&lt;"</span> <span class="s2">"msg:html open tag"</span> <span class="s2">"mz:ARGS|URL|BODY|$HEADERS_VAR:Cookie"</span> <span class="s2">"s:$XSS:8"</span> <span class="n">id</span>:<span class="m">1302</span>;
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>log</th>
+      <th>log 分析</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NAXSI_FMT</td>
+      <td>2022/10/20 17:53:37 [error] 7275#0: *5428 NAXSI_FMT:</td>
+    </tr>
+    <tr>
+      <td>對方IP</td>
+      <td>ip=223.58.42.103&amp;</td>
+    </tr>
+    <tr>
+      <td>請求的主機名　</td>
+      <td>server=taipei.test.com&amp;</td>
+    </tr>
+    <tr>
+      <td>uri</td>
+      <td>uri=/=a&lt;&gt;&amp;</td>
+    </tr>
+    <tr>
+      <td>Naxsi 版本　</td>
+      <td>vers=1.3&amp;</td>
+    </tr>
+    <tr>
+      <td>總共請求 20 次　</td>
+      <td>total_processed=20&amp;</td>
+    </tr>
+    <tr>
+      <td>總共阻擋 3 次　</td>
+      <td>total_blocked=3&amp;</td>
+    </tr>
+    <tr>
+      <td>設定：攔截　</td>
+      <td>config=block&amp;</td>
+    </tr>
+    <tr>
+      <td>分數標籤：XSS　</td>
+      <td>cscore1=$XSS&amp;</td>
+    </tr>
+    <tr>
+      <td>XSS分數</td>
+      <td>score1=8&amp;</td>
+    </tr>
+    <tr>
+      <td>符合的區域　</td>
+      <td>zone0=URL&amp;</td>
+    </tr>
+    <tr>
+      <td>符合的規則 id　</td>
+      <td>id0=1302&amp;</td>
+    </tr>
+    <tr>
+      <td>符合的變數</td>
+      <td>var_name0= ,</td>
+    </tr>
+    <tr>
+      <td>對方 IP</td>
+      <td>client: 223.58.42.103,</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>server=taipei.test.com,</td>
+    </tr>
+    <tr>
+      <td>請求內容</td>
+      <td>request: "GET /=a%3C%3E HTTP/2.0",</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td>host: "taipei.test.com"</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="九額外開啟-naxsi_exlog">九、(額外)開啟 NAXSI_EXLOG</h2>
+<p>開啟 NAXSI_EXLOG，可以記錄具體觸發 Naxsi 攔截規則的請求內容，內容紀錄正常和異常的請求，方便後續分析攔截的是攻擊請求還是誤判。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>log</th>
+      <th>log 分析</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NAXSI_FMT（原本就有）</td>
+      <td>僅包含 ID 和異常的位置</td>
+    </tr>
+    <tr>
+      <td>NAXSI_EXLOG</td>
+      <td>提供了實際的內容，可以輕鬆確認它是否為誤報</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="1-naxsi_exlog-設定">1. NAXSI_EXLOG 設定</h3>
+
+<p>在 conf 檔裡的 server 部分新增設定：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/vhost/xxx.conf
+
+<span class="nv">$ </span>vim /usr/local/nginx/conf/nginx.conf
+</code></pre></div></div>
+
+<p>裡面設定：</p>
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">server</span> 
+  {
+    <span class="n">set</span> $<span class="n">naxsi_extensive_log</span> <span class="m">1</span>;  
+  }
+</code></pre></div></div>
+
+<h3 id="2-naxsi_exlog-的-log-畫面">2. NAXSI_EXLOG 的 log 畫面</h3>
+<p>會多出現一個 NAXSI_EXLOG，就表示開啟成功。</p>
+
+<p><img src="/assets/images/2022-10-13-Nginx-Naxsi-module-27/11.jpg" alt="" /></p>
+
+<h2 id="十額外將-naxsi-加入-fail2ban">十、(額外)將 Naxsi 加入 Fail2ban</h2>
+<h3 id="1-fail2ban-新增-naxsi-過濾器">1. Fail2ban 新增 Naxsi 過濾器</h3>
+<p>filter 的 conf 名稱可以自訂。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/fail2ban/filter.d/nginx-naxsi.conf
+</code></pre></div></div>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">INCLUDES</span>]
+<span class="n">before</span> = <span class="n">common</span>.<span class="n">conf</span>
+
+[<span class="n">Definition</span>]
+<span class="n">failregex</span> = <span class="n">NAXSI_FMT</span>: <span class="n">ip</span>=&lt;<span class="n">HOST</span>&gt;&amp;<span class="n">server</span>=.*&amp;<span class="n">uri</span>=.*&amp;<span class="n">learning</span>=<span class="m">0</span>
+            <span class="n">NAXSI_FMT</span>: <span class="n">ip</span>=&lt;<span class="n">HOST</span>&gt;.*&amp;<span class="n">config</span>=<span class="n">block</span>
+<span class="n">ignoreregex</span> = <span class="n">NAXSI_FMT</span>: <span class="n">ip</span>=&lt;<span class="n">HOST</span>&gt;.*&amp;<span class="n">config</span>=<span class="n">learning</span>
+</code></pre></div></div>
+
+<h3 id="2-fail2ban-主要設定檔設定">2. Fail2ban 主要設定檔設定</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/fail2ban/jail.local
+</code></pre></div></div>
+
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">nginx</span>-<span class="n">naxsi</span>]
+<span class="n">enabled</span> = <span class="n">true</span>
+<span class="n">filter</span> = <span class="n">nginx</span>-<span class="n">naxsi</span>
+<span class="n">action</span> = <span class="n">iptables</span>-<span class="n">multiport</span>[<span class="n">name</span>=<span class="n">nginx</span>-<span class="n">naxsi</span>, <span class="n">port</span>=<span class="s2">"http,https"</span>, <span class="n">protocol</span>=<span class="n">tcp</span>]
+<span class="n">logpath</span> = /<span class="n">home</span>/<span class="n">wwwlogs</span>/<span class="n">naxsi_attach</span>.<span class="n">log</span>
+<span class="n">maxretry</span> = <span class="m">6</span>
+<span class="n">bantime</span> = -<span class="m">1</span> <span class="c"># 封鎖一輩子！
+</span></code></pre></div></div>
+
+<h2 id="十一額外白名單">十一、(額外)白名單</h2>
+<p>Naxsi 社區提供一些常用的白名單規則，例如:wordpress。</p>
+
+<p><a href="https://github.com/nbs-system/naxsi-rules" title="naxsi-rules  Github">naxsi-rules Github</a></p>
+
+<p>然後將規則 include 到 server 內的 location，重啟 nginx 即可，</p>
+
+<p>不過要注意一些這些白名單的修改日期，有些太老。</p>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://github.com/nbs-system/naxsi">Naxsi Github</a></li>
+  <li><a href="https://blog.cloudmax.com.tw/waf/">WAF 是什麼？你的網站需要 WAF 嗎？</a></li>
+  <li><a href="https://github.com/nbs-system/naxsi-rules">naxsi-rules Github</a></li>
+  <li><a href="https://bolerolily.github.io/2018/08/21/Naxsi-%E9%85%8D%E7%BD%AE%E7%99%BD%E5%90%8D%E5%8D%95/">Naxsi 配置白名單</a></li>
+  <li><a href="https://dotblogs.com.tw/eric_obay_talk/2018/10/22/150521">Nginx 搭配 Naxsi 實現 WAF 功能</a></li>
+  <li><a href="https://ithelp.ithome.com.tw/articles/10217411">Nginx naxsi + 色情守門員</a></li>
+  <li><a href="https://medium.com/@icarobichir/install-and-configure-nginx-with-naxsi-9aaa66f20d4e">Install and Configure Nginx With Naxsi</a></li>
+  <li><a href="https://www.securitypaper.org/5.%E9%99%84%E5%BD%95/04.naxsi%E5%AE%89%E8%A3%85%E6%B5%8B%E8%AF%95%E4%B8%8E%E7%AE%80%E4%BB%8B/">NAXSI安裝測試與簡介</a></li>
+  <li><a href="https://enterprise.fetnet.net/content/ebu/tw/epaper/tech/27th/FETnet-WAF-Firewall.html">沒 WAF 防火牆還想混網路？ WAF 防火牆非裝不可的 3 個原因</a></li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="Nginx" /><category term="nginx" /><category term="naxsi" /><category term="module" /><summary type="html"><![CDATA[使用的環境]]></summary></entry><entry><title type="html">閱讀心得(3)：在意別人而受傷，怎麼找回快樂</title><link href="http://localhost:4000/review/2022/08/22/Book-review-3-26.html" rel="alternate" type="text/html" title="閱讀心得(3)：在意別人而受傷，怎麼找回快樂" /><published>2022-08-22T00:00:00+08:00</published><updated>2022-08-22T00:00:00+08:00</updated><id>http://localhost:4000/review/2022/08/22/Book-review-3-26</id><content type="html" xml:base="http://localhost:4000/review/2022/08/22/Book-review-3-26.html"><![CDATA[<p><strong>書名：</strong>在意別人而受傷，怎麼找回快樂<br />
+<strong>作者：</strong>李東龜博士、李誠職博士、安夏陽博士<br />
+<strong>出版社：</strong>方言文化<br />
+<strong>出版日期：</strong>2021/11/10</p>
+
+<hr />
+
+<p><img src="/assets/images/2022-08-22-Review-閱讀心得-3-在意別人而受傷怎麼找回快樂-26/1.jpg" alt="" /></p>
+
+<hr />
+
+<p><strong>閱讀心得：</strong></p>
+
+<p>　　起初看到書名跟簡介就覺得很適合時常在意別人眼光的我，原因主要來自家庭影響及對身材的不自信，但是隨著年紀增長就越想要活出自己的風格，不想被別人的眼光及話語給束縛住。這本書詳細說明過度在意的類型與狀況，也提出一些建議作為改變自己的參考。</p>
+
+<p>　　書中說認同需求是期待自己的信念或行動希望自己的存在被肯定，也與馬斯洛提出的「需求層次理論」相同，但當認同需求過度，就等於將自己交給他人，若過度投入在這種思維，正常的自己就會消失，成為了他人眼中的自已，徒留孤單。</p>
+
+<p>　　有幾種解決方式，譬如：信賴自己的看法、感受跟判斷、藉由細微的小事提升自我人生的滿足感，或者是在難以擺脫痛苦、不安之時，找尋可安慰、撫慰自己的話語或行為，可以是別人說過的話或是勵志書籍上的一段話，下次若又遇到這種情況，就可以快速給自己勇氣跳出當下的情緒迴圈，也可試著選擇不同過往的自己所選擇的方式。</p>
+
+<p>　　從現在開始關注自己，傾聽自己內心那充滿陽光的聲音，並且開始規劃「有意義和有目標的生活」。分享書裡很喜歡的一段句子：「他人是否認同自己，不是我們可以控制的，我們能夠調整和控制的只有接納自我這件事情」。</p>]]></content><author><name>GiantFred</name></author><category term="Review" /><category term="book" /><category term="review" /><summary type="html"><![CDATA[給自己多一點自信。]]></summary></entry><entry><title type="html">利用 Nginx 的 GeoIP2 模組限制特定國家 IP 造訪網站</title><link href="http://localhost:4000/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25.html" rel="alternate" type="text/html" title="利用 Nginx 的 GeoIP2 模組限制特定國家 IP 造訪網站" /><published>2022-08-11T00:00:00+08:00</published><updated>2022-08-11T00:00:00+08:00</updated><id>http://localhost:4000/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25</id><content type="html" xml:base="http://localhost:4000/nginx/2022/08/11/2022-08-11-Nginx-Geoip2-module-25.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>nginx/1.16.1</td>
+    </tr>
+    <tr>
+      <td>geoipupdate 2.5.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一nginx-geoip2-模組介紹">一、Nginx GeoIP2 模組介紹</h2>
+<p>GeoIP2 是 Nginx 的動態模組，搭配 MaxMind 資料庫，可自動辨識 IP 所位於的國家，並設定規則，當特定國家 IP 造訪網站時，做出自訂的回應方式。</p>
+
+<h2 id="二下載-geoip2-模組的兩個方式">二、下載 GeoIP2 模組的兩個方式</h2>
+
+<h3 id="1-getpagespeed-的-rpm-repo需訂閱付費">1. GetPageSpeed 的 RPM repo（需訂閱付費）</h3>
+
+<blockquote class="prompt-warning">
+  <p>這要付錢，純紀錄，本篇文章不用這個方式。</p>
+</blockquote>
+
+<p>先去下載 GetPageSpeed 的 RPM repo，這樣才能載到新版的 <code class="language-plaintext highlighter-rouge">nginx-module-geoip2</code>。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>https://extras.getpagespeed.com/release-latest.rpm
+
+<span class="nv">$ </span>yum <span class="nb">install </span>nginx-module-geoip2
+</code></pre></div></div>
+
+<p>安裝到一半會說”缺少訂閱所以停止”，並附上一個訂閱的網址，點進去看到自己的 IP，再按訂閱就會跳至付款畫面。</p>
+
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/1.jpg" alt="" /></p>
+
+<h3 id="如果安裝了這個-repo但反悔想刪掉的話怎麼辦">如果安裝了這個 repo，但反悔想刪掉的話怎麼辦？</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 先查詢這個 repo 完整的 rpm 套件名稱</span>
+<span class="nv">$ </span>rpm <span class="nt">-qa</span> |grep <span class="nt">-i</span> getpagespeed
+getpagespeed-extras-release-11-31.noarch
+
+<span class="c"># 如果有找到 rpm 套件名稱，就可加上 -e 刪除</span>
+<span class="nv">$ </span>rpm <span class="nt">-e</span> getpagespeed-extras-release-11-31.noarch
+</code></pre></div></div>
+
+<h3 id="2-從-github-下載">2. 從 Github 下載</h3>
+
+<p><a href="https://github.com/leev/ngx_http_geoip2_module" title="leev/ngx_http_geoip2_module">leev/ngx_http_geoip2_module</a></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 建立新資料夾</span>
+<span class="nv">$ </span><span class="nb">mkdir </span>nginx_module/
+
+<span class="nv">$ </span><span class="nb">cd </span>nginx_module/
+
+<span class="c"># 下載 Github 上的 GeoIP2 模組</span>
+<span class="nv">$ </span>git clone https://github.com/leev/ngx_http_geoip2_module.git
+
+<span class="nv">$ </span><span class="nb">cd </span>ngx_http_geoip2_module/
+</code></pre></div></div>
+
+<h2 id="三安裝-geoipupdate">三、安裝 geoipupdate</h2>
+
+<p>因為 IP 時常有變化，所以 MaxMind 提供 <code class="language-plaintext highlighter-rouge">geoipupdate</code> 工具，可以讓我們更新 IP 清單，但這個工具需要搭配 MaxMind 帳號和 License Key。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>geoipupdate geoipupdate-cron <span class="nt">-y</span>
+
+<span class="c"># 查看版本</span>
+<span class="nv">$ </span>geoipupdate <span class="nt">-v</span>
+geoipupdate 2.5.0
+</code></pre></div></div>
+<p>查看版本是因為 License Key 需要對應 <code class="language-plaintext highlighter-rouge">geoipupdate</code> 的版本。</p>
+
+<h3 id="也可以從-maxmind-官方-github-下載新版的-geoipupdate">也可以從 MaxMind 官方 Github 下載新版的 geoipupdate</h3>
+
+<p><a href="https://github.com/maxmind/geoipupdate/releases" title="maxmind/geoipupdate">maxmind/geoipupdate
+</a></p>
+
+<p>目前最新的版本是 4.9.0 (2022/08)。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 下載 geoipupdate 的 RPM 套件</span>
+<span class="nv">$ </span>wget https://github.com/maxmind/geoipupdate/releases/download/v4.9.0/geoipupdate_4.9.0_linux_386.rpm
+
+<span class="c"># 安裝 geoipupdate </span>
+<span class="nv">$ </span>rpm <span class="nt">-i</span> geoipupdate_4.8.0_linux_386.rpm
+</code></pre></div></div>
+
+<h2 id="四取得免費的-geolite2-的-license-key">四、取得免費的 GeoLite2 的 License Key</h2>
+<p>MaxMind 提供的資料庫有分為商業版 GeoIP2 和免費版 GeoLite2，免費版的資料庫有各國家的 IP 對照表，而商業版有城市、經緯度等等更詳細的資訊。</p>
+
+<p>網路上有網友實測，免費版的對於城市定位精準度會有些差異，所以就看看自己的需求來選擇囉～</p>
+
+<p>本篇文章是使用 GeoLite2 資料庫。</p>
+
+<h3 id="1-註冊會員">1. 註冊會員</h3>
+<p><a href="https://www.maxmind.com/en/geolite2/signup?utm_source=kb&amp;utm_medium=kb-link&amp;utm_campaign=kb-create-account" title="GeoLite2">GeoLite2</a></p>
+
+<p>填寫完再去 mail 啟用和設定密碼後就代表註冊成功了！<br />
+<img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/2.jpg" alt="" /></p>
+
+<h3 id="2-建立-license-key">2. 建立 License Key</h3>
+<p>登入 MaxMind 網站後，按左方 Manage License Keys，現在來要建立 License Key。</p>
+
+<p>依照 <code class="language-plaintext highlighter-rouge">geoipupdate</code> 版本去選（我的 <code class="language-plaintext highlighter-rouge">geoipupdate</code> 版本是 2.5.0）。</p>
+
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/3.jpg" alt="" /></p>
+
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/4.jpg" alt="" /></p>
+
+<p>之後會有 ID 跟 License Key，點選 Download Config，會自動下載一個 <code class="language-plaintext highlighter-rouge">GeoIP.conf</code> 檔案，將這個檔案覆蓋主機上的 <code class="language-plaintext highlighter-rouge">/etc/GeoIP.conf</code>。</p>
+
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/5.jpg" alt="" /></p>
+
+<h3 id="3-更新-maxmind-資料庫">3. 更新 Maxmind 資料庫</h3>
+
+<p>覆蓋完 <code class="language-plaintext highlighter-rouge">GeoIP.conf</code> 檔案後，用 <code class="language-plaintext highlighter-rouge">geoipupdate</code> 跑一次 Maxmind 資料庫更新。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>geoipupdate
+
+<span class="nv">$ </span>geoipupdate <span class="nt">-v</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/6.jpg" alt="" /></p>
+
+<p>可以將指令寫進 crontab 排程，讓它定時更新 Maxmind 資料庫。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1 0 <span class="k">*</span> <span class="k">*</span> 1,4 /usr/bin/geoipupdate
+</code></pre></div></div>
+
+<h3 id="小技巧mmdblookup-工具">小技巧：mmdblookup 工具</h3>
+<p><code class="language-plaintext highlighter-rouge">mmdblookup</code> 可以在指定的 Maxmind 資料庫中查詢 IP，IP 的記錄會以類似 JSON 的結構顯示。</p>
+
+<p>Maxmind 資料庫檔案放在 <code class="language-plaintext highlighter-rouge">/usr/share/GeoIP</code>。</p>
+
+<p><a href="http://www.geonames.org/countries/" title="國家清單可以參考此網站">國家清單可以參考此網站</a></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -f/--file: 指定檔案</span>
+<span class="c"># -i/--ip: 指定 IP</span>
+<span class="c"># -v: 詳細說明</span>
+<span class="c"># country names 表示是用什麼語言來輸出國家名稱</span>
+<span class="nv">$ </span>mmdblookup <span class="nt">--file</span> /usr/share/GeoIP/GeoLite2-Country.mmdb <span class="nt">--ip</span> 47.52.76.54 country names en
+
+<span class="nv">$ </span>mmdblookup <span class="nt">--file</span> /usr/share/GeoIP/GeoLite2-Country.mmdb <span class="nt">--ip</span> 47.52.76.54 country iso_code
+</code></pre></div></div>
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/9.jpg" alt="" /></p>
+
+<h2 id="五nginx-編譯-geoip-模組">五、Nginx 編譯 GeoIP 模組</h2>
+
+<h3 id="1-找到有含-configure-的資料夾">1. 找到有含 configure 的資料夾</h3>
+<p>若 Nginx 是用 yum install 安裝的，會沒有 <code class="language-plaintext highlighter-rouge">configure</code> 檔案，但如果真的想要新增第三方模組，只需對相同版本的 Nginx 原始碼進行編譯後替換即可。</p>
+
+<blockquote class="prompt-info">
+  <p>但模組若也是用 <code class="language-plaintext highlighter-rouge">yum install</code> 安裝，就可以直接在 nginx.conf 上面新增 <code class="language-plaintext highlighter-rouge">load_module modules/ngx_http_geoip2_module.so;</code></p>
+</blockquote>
+
+<p>我的 Nginx 是 1.16.1 版本，就找 Nginx 1.16.1 的壓縮檔 <code class="language-plaintext highlighter-rouge">nginx-1.16.1.tar.gz</code>，並解壓縮，就可以得到 <code class="language-plaintext highlighter-rouge">configure</code> 以及其他編譯需要用的檔案。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">tar </span>xvpzf nginx-1.16.1.tar.gz
+
+<span class="nv">$ </span><span class="nb">cd </span>nginx-1.16.1
+
+<span class="nv">$ </span>ll
+</code></pre></div></div>
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/10.jpg" alt="" /></p>
+
+<h3 id="2-查看-nginx-原先有的模組">2. 查看 Nginx 原先有的模組</h3>
+<p>先查看 Nginx 原本有什麼模組，當編譯新的模組時，原有的模組也要原封不動的寫進去，不然到時候編譯完成後會不見（就是底下 <code class="language-plaintext highlighter-rouge">configure arguments</code> 那段）。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nginx <span class="nt">-V</span>
+
+nginx version: nginx/1.16.1
+built by gcc 4.8.5 20150623 <span class="o">(</span>Red Hat 4.8.5-44<span class="o">)</span> <span class="o">(</span>GCC<span class="o">)</span>
+built with OpenSSL 1.1.1d  10 Sep 2019
+TLS SNI support enabled
+configure arguments: <span class="nt">--user</span><span class="o">=</span>www <span class="nt">--group</span><span class="o">=</span>www <span class="nt">--prefix</span><span class="o">=</span>/usr/local/nginx <span class="nt">--with-http_stub_status_module</span> <span class="nt">--with-http_ssl_module</span> <span class="nt">--with-http_v2_module</span> <span class="nt">--with-http_gzip_static_module</span> <span class="nt">--with-http_sub_module</span> <span class="nt">--with-stream</span> <span class="nt">--with-stream_ssl_module</span> <span class="nt">--with-openssl</span><span class="o">=</span>/root/lnmp1.6/src/openssl-1.1.1d <span class="nt">--with-openssl-opt</span><span class="o">=</span>enable-weak-ssl-ciphers
+</code></pre></div></div>
+
+<h3 id="3-編譯-geoip2-模組">3. 編譯 GeoIP2 模組</h3>
+<p>要在有 configure 的那個資料夾底下編譯，模組安裝路徑可以用絕對路徑比較保險。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./configure <span class="nt">--user</span><span class="o">=</span>www <span class="nt">--group</span><span class="o">=</span>www <span class="se">\</span>
+<span class="nt">--prefix</span><span class="o">=</span>/usr/local/nginx <span class="se">\</span>
+<span class="nt">--with-http_stub_status_module</span> <span class="se">\</span>
+<span class="nt">--with-http_ssl_module</span> <span class="se">\</span>
+<span class="nt">--with-http_v2_module</span> <span class="se">\</span>
+<span class="nt">--with-http_gzip_static_module</span> <span class="se">\</span>
+<span class="nt">--with-http_sub_module</span> <span class="se">\</span>
+<span class="nt">--with-stream</span> <span class="se">\</span>
+<span class="nt">--with-stream_ssl_module</span> <span class="se">\</span>
+<span class="nt">--with-openssl</span><span class="o">=</span>/root/lnmp1.6/src/openssl-1.1.1d <span class="se">\</span>
+<span class="nt">--with-openssl-opt</span><span class="o">=</span>enable-weak-ssl-ciphers <span class="se">\</span>
+<span class="nt">--add-dynamic-module</span><span class="o">=</span>/usr/local/nginx_module/ngx_http_geoip2_module
+
+<span class="nv">$ </span>make 
+
+<span class="c"># 有些人說不要 make install，但我用 make module 或純粹 make 都沒有用，不知道原因</span>
+<span class="nv">$ </span>make <span class="nb">install</span>
+</code></pre></div></div>
+
+<h3 id="4-編譯時出現問題">4. 編譯時出現問題</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>error:
+adding module <span class="k">in</span> /usr/local/nginx_module/ngx_http_geoip2_module
+checking <span class="k">for </span>MaxmindDB library ... not found
+./configure: error: the geoip2 module requires the maxminddb library.
+</code></pre></div></div>
+
+<p>上網爬文，安裝 <code class="language-plaintext highlighter-rouge">libmaxminddb-devel</code> 後即可正常編譯。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>libmaxminddb-devel
+</code></pre></div></div>
+
+<p>安裝好後，重複上面第 3 點的步驟。</p>
+
+<h3 id="5-查看是否編譯成功">5. 查看是否編譯成功</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nignx <span class="nt">-V</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/7.jpg" alt="" /></p>
+
+<p>在 Nginx 的安裝路徑也會自動產生一個 <code class="language-plaintext highlighter-rouge">modules</code> 資料夾，且裡面有兩個檔案，有出現代表新增模組成功。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/local/nginx/modules/ngx_http_geoip2_module.so
+/usr/local/nginx/modules/ngx_stream_geoip2_module.so
+</code></pre></div></div>
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/8.jpg" alt="" /></p>
+
+<h2 id="六nginxconf-或-vhostconf-設定">六、Nginx.conf 或 vhost.conf 設定</h2>
+<p>開始設定 nginx.conf。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /usr/local/nginx/conf/nginx.conf
+</code></pre></div></div>
+<h3 id="1-全區塊">1. 全區塊</h3>
+
+<p>在 pid 下面新增這兩句：</p>
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">load_module</span> <span class="n">modules</span>/<span class="n">ngx_http_geoip2_module</span>.<span class="n">so</span>;
+<span class="n">load_module</span> <span class="n">modules</span>/<span class="n">ngx_stream_geoip2_module</span>.<span class="n">so</span>;
+</code></pre></div></div>
+
+<h3 id="2-http-區塊">2. http 區塊</h3>
+<p>在 http 區塊新增下面這串:</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">geoip2</span> /<span class="n">usr</span>/<span class="n">share</span>/<span class="n">GeoIP</span>/<span class="n">GeoLite2</span>-<span class="n">Country</span>.<span class="n">mmdb</span> {
+<span class="n">auto_reload</span> <span class="m">5</span><span class="n">m</span>;
+$<span class="n">geoip2_metadata_country_build</span> <span class="n">metadata</span> <span class="n">build_epoch</span>;
+
+$<span class="n">geoip2_data_country_code</span> <span class="n">country</span> <span class="n">iso_code</span>;
+$<span class="n">geoip2_data_country_name</span> <span class="n">country</span> <span class="n">names</span> <span class="n">en</span>;
+}
+
+<span class="n">geoip2</span> /<span class="n">usr</span>/<span class="n">share</span>/<span class="n">GeoIP</span>/<span class="n">GeoLite2</span>-<span class="n">City</span>.<span class="n">mmdb</span> {
+$<span class="n">geoip2_data_city_name</span> <span class="n">city</span> <span class="n">names</span> <span class="n">en</span>;
+}
+<span class="n">fastcgi_param</span> <span class="n">COUNTRY_CODE</span> $<span class="n">geoip2_data_country_code</span>;
+<span class="n">fastcgi_param</span> <span class="n">COUNTRY_NAME</span> $<span class="n">geoip2_data_country_name</span>;
+<span class="n">fastcgi_param</span> <span class="n">CITY_NAME</span>    $<span class="n">geoip2_data_city_name</span>;
+
+<span class="n">map</span> $<span class="n">geoip2_data_country_code</span> $<span class="n">blacklisted_country</span> {
+<span class="n">default</span> <span class="n">no</span>;
+<span class="n">CN</span> <span class="n">yes</span>;  <span class="c">#yes 就是封鎖
+</span><span class="n">HK</span> <span class="n">yes</span>;  <span class="c">#yes 就是封鎖
+</span>} 
+</code></pre></div></div>
+
+<h3 id="server-區塊">server 區塊</h3>
+<p>在 server 區塊新增下面這串:</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">if</span> ($<span class="n">blacklisted_country</span> = <span class="n">yes</span>) 
+    {
+      <span class="n">return</span> <span class="m">400</span>;
+    }
+</code></pre></div></div>
+
+<h2 id="七測試是否成功">七、測試是否成功</h2>
+
+<p>上面在 nginx.conf 的 http 區塊有設定 <code class="language-plaintext highlighter-rouge">CN yes;</code> 和 <code class="language-plaintext highlighter-rouge">HK yes;</code>，代表：當造訪的 IP 是來自於 CN 跟 HK，就會收到 400 錯誤。</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CN</span> <span class="n">yes</span>;  <span class="c">#yes 就是封鎖
+</span><span class="n">HK</span> <span class="n">yes</span>;  <span class="c">#yes 就是封鎖
+</span></code></pre></div></div>
+
+<p>可以利用 <code class="language-plaintext highlighter-rouge">curl</code> 工具來測試這個模組及設定有沒有運作。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -I: 顯示 Header</span>
+<span class="c"># -L: 是跟著301走（會轉址）</span>
+
+<span class="nv">$ </span>curl <span class="nt">-IL</span> xxxxx.com
+<span class="nv">$ </span>curl <span class="nt">-IL</span> x.x.x.x
+</code></pre></div></div>
+
+<h3 id="實際測試">實際測試</h3>
+
+<p>本篇文章使用的主機是來自 HK ，因此可以試著自己造訪自己，看看結果如何？</p>
+
+<p>在下圖可以看到，要造訪這台主機，結果會報 400 Bad Request 錯誤，所以 GeoIP2 模組的確有在好好運作～ <br />
+<img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/11.jpg" alt="" /></p>
+
+<p>那如果把 <code class="language-plaintext highlighter-rouge">HK yes;</code> 改成 <code class="language-plaintext highlighter-rouge">HK no;</code> 會如何呢？</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CN</span> <span class="n">yes</span>;  <span class="c">#yes 就是封鎖
+</span><span class="n">HK</span> <span class="n">no</span>;  <span class="c">#no 就是不封鎖
+</span></code></pre></div></div>
+
+<p>在下圖可以看到主機回覆了 403 錯誤，這是正常的，因為我沒在裡面放東西。</p>
+
+<p>不過由此可知，如果沒有造訪的 IP 沒有在我們制定的名單內，就可以正常造訪主機或網站。</p>
+
+<p><img src="/assets/images/2022-08-11-Nginx-Geoip2-module-25/12.jpg" alt="" /></p>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li><a href="https://www.getpagespeed.com/server-setup/nginx/upgrade-to-geoip2-with-nginx-on-centos-rhel">Upgrade to GeoIP2 with NGINX on CentOS/RHEL</a></li>
+  <li><a href="https://www.if-not-true-then-false.com/2010/yum-remove-repo-repository-yum-disable-repo-repository/">YUM/DNF Remove Repo – YUM/DNF Disable Repository</a></li>
+  <li><a href="https://www.maxmind.com/en/geolite2/signup?utm_source=kb&amp;utm_medium=kb-link&amp;utm_campaign=kb-create-account">GeoLite2 Sign Up</a></li>
+  <li><a href="https://support.maxmind.com/hc/en-us/articles/4407099783707-Create-an-Account#h_01G4G4NV169TJWFCJ1KGFAM1CD">Sign up for free GeoLite2 databases and web services
+</a></li>
+  <li><a href="https://maxmind.github.io/libmaxminddb/mmdblookup.html">mmdblookup</a></li>
+  <li><a href="https://stackoverflow.com/questions/62213884/how-install-the-geoip2-module-on-a-nginx-running-in-a-production-environment">How install the Geoip2 module on a Nginx running in a production environment?</a></li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="Nginx" /><category term="nginx" /><category term="geoip2" /><category term="geolite2" /><category term="module" /><summary type="html"><![CDATA[使用的環境]]></summary></entry><entry><title type="html">架設自己的 Docker Registry</title><link href="http://localhost:4000/docker/2022/07/11/Create-docker-registry-24.html" rel="alternate" type="text/html" title="架設自己的 Docker Registry" /><published>2022-07-11T00:00:00+08:00</published><updated>2022-07-11T00:00:00+08:00</updated><id>http://localhost:4000/docker/2022/07/11/Create-docker-registry-24</id><content type="html" xml:base="http://localhost:4000/docker/2022/07/11/Create-docker-registry-24.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>Docker 1.13.1</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一docker-registry-是什麼">一、Docker Registry 是什麼？</h2>
+
+<ul>
+  <li>開放原始碼的軟體</li>
+  <li>提供存放 Docker Image 的空間，可與他人共用</li>
+  <li>可以分為公開或私人的 Registry</li>
+</ul>
+
+<h2 id="二docker-registry-vs-docker-distribution">二、Docker Registry v.s. Docker Distribution</h2>
+
+<p>Docker Registry 1.0 - Docker Registry 專案<br />
+Docker Registry 2.0 - Docker Distribution 專案</p>
+
+<p>Docker Distribution 專案取代並增強 Docker Registry 專案，同時也朝向更完善且有彈性的 Docker Image 整合管理工具。</p>
+
+<h3 id="1-docker-distribution-專案新增的元件">1. Docker Distribution 專案新增的元件</h3>
+
+<ul>
+  <li>函式庫：原本由 python 開發，現在改用 golang</li>
+  <li>規範：相關規範都可以在 Docker Distribution 的 Github Repo 的 docs/spec 資料夾找到</li>
+  <li>文件：docs 資料夾裡有 docs.docker.com 和 Docker Distribution 相關的說明文件</li>
+</ul>
+
+<h3 id="2-docker-distribution-專案功能的增益項目">2. Docker Distribution 專案功能的增益項目</h3>
+
+<ul>
+  <li>更快的 <code class="language-plaintext highlighter-rouge">docker push</code> 和 <code class="language-plaintext highlighter-rouge">docker pull</code> 執行速度</li>
+  <li>改善並提升 Docker Registry 的整體運作效能</li>
+  <li>簡化 Docker Registry  部署方式</li>
+  <li>提供可插拔的儲存庫後端，可自行選擇上傳後的 Docker Image 儲存方式和位置，可與多種雲端儲存服務整合（AWS S3…等等）</li>
+  <li>提供 webhook 的通知機制</li>
+</ul>
+
+<h2 id="三docker-hub-和-docker-cloud">三、Docker Hub 和 Docker Cloud</h2>
+<p>Docker Hub 是 Docker 官方提供的免費服務，主要用途是提供 Docker Image 的儲存庫。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker search</code> 和 <code class="language-plaintext highlighter-rouge">docker pull</code> 所存取的 Docker Registry 就是 <a href="https://hub.docker.com" title="Docker Hub">Docker Hub</a>。</p>
+
+<p>Docker Cloud 除了利用 Docker Hub 的儲存庫功能，主要用途是提供 Docker 化應用系統（Dockerized application）的完整架構與自動化服務。</p>
+
+<p>Docker 化（Dockerized）：把應用程式 Docker 化，把程式跟環境包成一個 image，部署的時候就直接使用這個 image 不需要額外安裝其他東西。</p>
+
+<p>如果所開發的應用系統已經 Docker 化或準備 Docker 化，且運行在雲端運算環境，那 Docker Cloud 就可以協助自動化和加速整個應用系統在建版、測試、部署和節點管理上的工作。</p>
+
+<p>Docker Hub 和 Docker Cloud 的帳號是共用的，不需要分別註冊，且可以直接在 Docker Cloud 中使用上傳到 Docker Hub 的 Docker Image。</p>
+
+<h2 id="四為何不用-docker-hub-就好">四、為何不用 Docker Hub 就好？</h2>
+
+<p>Docker Hub 是免費且公開的服務，但 Docker Image 的散佈和部署會遇到機密敏感資料與安全考量，以及使用環境的不可用性問題。</p>
+
+<ul>
+  <li>機密敏感性的安全問題：Docker Image 可能包含程式碼或不適宜公開的環境設定資訊</li>
+  <li>公司或組織的環境問題：不同環境有不同考量，譬如開發環境、整合測試、使用者驗證環境、內外網連線以及儲存管理部署 Docker Image 的需求，就會需要在公司內架設專用的 Docker Registry</li>
+</ul>
+
+<h2 id="五架設-docker-registry">五、架設 Docker Registry</h2>
+
+<h3 id="1-下載及啟動-docker-registry-的-docker-image">1. 下載及啟動 Docker Registry 的 Docker Image</h3>
+
+<p>架設 Docker Registry 就是啟用一個 Docker Registry 的 Docker Container。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -p 5000：將主機的 5000 port mapping 到 container 的 5000 port</span>
+<span class="nv">$ </span>docker pull registry:2
+<span class="nv">$ </span>docker run <span class="nt">-d</span> <span class="nt">-p</span> 5000:5000 <span class="nt">--name</span> registry registry:2
+</code></pre></div></div>
+
+<p>也可以用 <code class="language-plaintext highlighter-rouge">-v</code> 掛載資料卷，因為如果 Docker Registry 的資料是放在 Container 裡面，刪掉 Container 時裡面的資料就會跟著不見，所以需要使用 <code class="language-plaintext highlighter-rouge">–v</code> 將主機的檔案路徑 mapping 到 Container 裡面的檔案路徑，這樣就算 Docker Container 被刪除， Docker Registry 的 Image 資料還會存在。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">-d</span> <span class="nt">-p</span> 5000:5000 <span class="nt">-v</span> /usr/local/docker/registry:/var/lib/registry <span class="nt">--name</span> registry registry:2
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/1.jpg" alt="" /></p>
+
+<h3 id="2-用指令或瀏覽器確認-docker-registry-是否啟動成功">2. 用指令或瀏覽器確認 Docker Registry 是否啟動成功</h3>
+<p>也可以檢查版本是否為 V2，如果傳回「{ }」，就表示 Docker Registry 已經成功運作。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-LX</span> GET 127.0.0.1:5000/v2
+<span class="o">{}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/2.jpg" alt="" /></p>
+
+<p>也可以直接用瀏覽器開啟，如果正常啟動一樣會看到「{}」。<br />
+<a href="http://127.0.0.1:5000/v2" title="http://127.0.0.1:5000/v2">http://127.0.0.1:5000/v2</a></p>
+
+<p>如果不是在架設 Docker Registry 的電腦上執行，可以把 IP 位址換成實際的位址：
+<a href="http://x.x.x.x:5000/v2" title="http://x.x.x.x:5000/v2">http://x.x.x.x:5000/v2/</a></p>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/3.jpg" alt="" /></p>
+
+<h2 id="六將-docker-image-上傳到-docker-registry">六、將 Docker Image 上傳到 Docker Registry</h2>
+<p>以下步驟先用 nginx 的 Docker Image 當作範例。</p>
+
+<h3 id="1-標記-docker-image">1. 標記 Docker Image</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker tag nginx 127.0.0.1:5000/nginx_local
+
+<span class="c"># 如果不是在架設 Docker Registry 的電腦上執行，可以把 IP 位址換成實際的位址</span>
+<span class="nv">$ </span>docker tag nginx x.x.x.x:5000/nginx_local
+
+<span class="c"># 查看標記後的 Image</span>
+<span class="nv">$ </span>docker images
+</code></pre></div></div>
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/4.jpg" alt="" /></p>
+
+<h3 id="2-將-docker-image-push-到-docker-registry-server">2. 將 Docker Image push 到 Docker Registry Server</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker push 127.0.0.1:5000/nginx_local
+</code></pre></div></div>
+
+<p>在這邊遇到問題，所以沒有成功將 Docker Image Push 到 Docker Registry 上。</p>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/5.jpg" alt="" /></p>
+
+<p>這個錯誤訊息主要是因為安全性上的問題，需要修改 client 端的 Docker 設定。</p>
+
+<p><code class="language-plaintext highlighter-rouge">insecure-registries</code>：insecure 的意思是非安全性，所以如果是使用 http 協定的 docker registry 就需要設定此參數。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>vim /etc/docker/daemon.json
+
+<span class="o">{</span>
+<span class="s2">"insecure-registries"</span>: <span class="o">[</span><span class="s2">"x.x.x.x:5000"</span><span class="o">]</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/6.jpg" alt="" /></p>
+
+<p>重新啟動 Docker，並重新 push docker image。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>systemctl restart docker
+
+<span class="nv">$ </span>docker push 127.0.0.1:5000/nginx_local
+</code></pre></div></div>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/7.jpg" alt="" /></p>
+
+<p>用瀏覽器開啟查詢：</p>
+
+<p><a href="http://127.0.0.1:5000/v2/_catalog" title="http://127.0.0.1:5000/v2/_catalog">http://127.0.0.1:5000/v2/_catalog</a></p>
+
+<p><a href="http://x.x.x.x:5000/v2/_catalog" title="http://x.x.x.x:5000/v2/_catalog">http://x.x.x.x:5000/v2/_catalog</a></p>
+
+<p><img src="/assets/images/2022-07-11-Create-docker-registry-24/8.jpg" alt="" /></p>
+
+<p>如果要下載剛剛上傳的 nginx_local，就用 <code class="language-plaintext highlighter-rouge">docker pull</code> 抓下來。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker pull 127.0.0.1:5000/nginx_local
+<span class="nv">$ </span>docker pull x.x.x.x:5000/nginx_local
+</code></pre></div></div>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li>Docker 這樣學才有趣：從入門，到玩直播、挖礦</li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="Docker" /><category term="centos" /><category term="docker" /><category term="container" /><category term="docker registry" /><summary type="html"><![CDATA[使用的環境]]></summary></entry><entry><title type="html">有關 Feeling 這個分類項目</title><link href="http://localhost:4000/feeling/2022/07/07/The-first-post-in-feeling-23.html" rel="alternate" type="text/html" title="有關 Feeling 這個分類項目" /><published>2022-07-07T00:00:00+08:00</published><updated>2022-07-07T00:00:00+08:00</updated><id>http://localhost:4000/feeling/2022/07/07/The-first-post-in-feeling-23</id><content type="html" xml:base="http://localhost:4000/feeling/2022/07/07/The-first-post-in-feeling-23.html"><![CDATA[<h1 id="my-feeling">My Feeling</h1>
+<p>開了一個 Feeling 分類，裡面的文章會簡單地放些照片跟幾段文字。</p>
+
+<p>內容有可能是描述照片的情況、當下的心情、突然的感觸，或是歌曲的歌詞、書上看到的很喜歡或有道理的文字，也有可能是無聊的冷笑話。</p>
+
+<p>很 Free，主要就是輕鬆小品的概念。</p>
+
+<p>順便訓練一下用文字表達心情及想法的能力，平常都被生動的貼圖給養壞了XD</p>]]></content><author><name>GiantFred</name></author><category term="Feeling" /><category term="feeling" /><summary type="html"><![CDATA[easy easy~]]></summary></entry><entry><title type="html">利用 Docker Compose 管理多個 Container</title><link href="http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html" rel="alternate" type="text/html" title="利用 Docker Compose 管理多個 Container" /><published>2022-07-05T00:00:00+08:00</published><updated>2022-07-05T00:00:00+08:00</updated><id>http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22</id><content type="html" xml:base="http://localhost:4000/docker/2022/07/05/Run-multiple-containers-with-Docker-Compose-22.html"><![CDATA[<h2 id="使用的環境">使用的環境</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>系統與使用工具</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Centos 7.6</td>
+    </tr>
+    <tr>
+      <td>Docker 1.13.1</td>
+    </tr>
+    <tr>
+      <td>docker-compose version 1.18.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="一docker-compose-介紹">一、Docker Compose 介紹</h2>
+<p>Docker Compose 主要是來管理需要同時運行多個 Docker Container 的狀況。</p>
+
+<p>透過 docker-compose.yml 和 docker-compose 指令，加上對 Dockerfile 的支援，快速將多個 Docker Container 分別建立並串接在同一個網路下進行整合，並用簡便的指令來管理同一個 docker-compose.yml 所啟動的 Docker Container。</p>
+
+<h2 id="二什麼情況會需要用到-docker-compose">二、什麼情況會需要用到 Docker Compose？</h2>
+
+<ul>
+  <li>開發、測試環境或正式運行的生產環境皆可使用</li>
+  <li>所使用的應用系統會需要連結或整合一個以上的 Container</li>
+  <li>想達到更彈性和自動化的部署</li>
+</ul>
+
+<h2 id="三一個-container-或多個-container">三、一個 Container 或多個 Container？</h2>
+<p>不建議將應用系統需要的服務和元件都放進同一個 Docker Container 裡面，因為設定工作會變複雜，而且這種 Docker Image 在啟動時，會需要更多的環境變數和啟動設定才能順利啟動。</p>
+
+<p>建議把應用系統需要的服務和元件都製作成不同的 Docker Image，然後透過 Docker Compose 設定、整合和啟動所需的 Container，這樣能善用分散式運算的能力，每項服務都可以依需要獨立擴充和抽拔，更有效率。</p>
+
+<h2 id="四在-centos-安裝-docker-compose">四、在 CentOS 安裝 Docker Compose</h2>
+<p>Docker 和 Docker Compose 是各自獨立的程式，版本號碼也不同步，所以需要分別手動安裝。</p>
+
+<h3 id="1-用-yum-套件安裝">1. 用 yum 套件安裝</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>docker-compose
+</code></pre></div></div>
+
+<h3 id="2-用-pip-安裝">2. 用 pip 安裝</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 安裝 pip</span>
+<span class="nv">$ </span>yum <span class="nb">install </span>python-pip
+
+<span class="c"># 升級 pip</span>
+<span class="nv">$ </span>pip <span class="nb">install</span> <span class="nt">--upgrade</span> pip
+
+<span class="c"># 安裝 docker compose</span>
+<span class="nv">$ </span>pip <span class="nb">install </span>docker-compose
+
+<span class="c"># 建立連結檔</span>
+<span class="nv">$ </span><span class="nb">ln</span> <span class="nt">-s</span> /usr/local/bin/docker-compose /usr/bin/docker-compose
+</code></pre></div></div>
+
+<p>安裝完後，查看 Docker Compose 版本：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose <span class="nt">-v</span>
+<span class="nv">$ </span>docker-compose version
+
+docker-compose version 1.18.0, build 8dd22a9
+</code></pre></div></div>
+
+<h2 id="五用範例了解-docker-compose-的運作方式">五、用範例了解 Docker Compose 的運作方式</h2>
+<p>Docker Compose 功能主要是由 docker-compose 指令和 docker-compose.yml 組成。</p>
+
+<p>docker-compose 指令可以執行大部分的 docker 指令的選項和功能，但可以直接使用 docker-compose.yml 裡的設定值，而不用像 docker 指令是由選項一一指定。</p>
+
+<p>docker-compose.yml 是採用 YAML 檔案格式來撰寫，是一種以「鍵/值 (Key/Value)」方式指定設定變數與設定值的格式，除了 <code class="language-plaintext highlighter-rouge">version</code> 標籤外，主要是由 <code class="language-plaintext highlighter-rouge">services（服務）</code>、<code class="language-plaintext highlighter-rouge">volumes（資料卷）</code>、<code class="language-plaintext highlighter-rouge">networks（網路）</code> 等三大標籤所構成。</p>
+
+<ul>
+  <li>services：定義和設定此 docker-compose.yml 需要啟動的 Container 資訊，功能和所使用的標籤和 <code class="language-plaintext highlighter-rouge">docker run</code> 相似，都是用於啟動 Container</li>
+  <li>volumes：定義給服務使用資料儲存資訊</li>
+  <li>networks：定義給服務的連結網路資訊</li>
+</ul>
+
+<p>而每個 docker-compose.yml 的檔案結構會有 <code class="language-plaintext highlighter-rouge">version</code>、<code class="language-plaintext highlighter-rouge">services</code>、<code class="language-plaintext highlighter-rouge">volumes</code>、<code class="language-plaintext highlighter-rouge">networks</code>、<code class="language-plaintext highlighter-rouge">configs</code>、<code class="language-plaintext highlighter-rouge">secrets</code> 等六個頂層指令組成，後面會講到。</p>
+
+<h3 id="1-docker-composeyml-範例">1. docker-compose.yml 範例</h3>
+
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/1.jpg" alt="" /></p>
+
+<h3 id="2-驗證-docker-composeyml-內容不會真正執行">2. 驗證 docker-compose.yml 內容（不會真正執行）</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose config
+<span class="c"># -f：指定檔案</span>
+<span class="c"># -q：如果一切正常，檢查完成後不顯示出任何訊息（原本會顯示完整的 docker-compose.yml 內容）</span>
+
+<span class="nv">$ </span>docker-compose config <span class="nt">-q</span>
+<span class="nv">$ </span>docker-compose <span class="nt">-f</span> /usr/local/docker-test/node-red/docker-compose.yml config <span class="nt">-q</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/2.jpg" alt="" /></p>
+
+<h3 id="3-啟動-docker-composeyml-內所有的服務">3. 啟動 docker-compose.yml 內所有的服務</h3>
+<blockquote class="prompt-info">
+  <p>用 docker-compose.yml 啟動服務，services 名稱前面預設是資料夾名，可以加上 <code class="language-plaintext highlighter-rouge">-p</code> 選項指定專案名稱。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -d：在背景模式執行，如果沒有加上 -d，Container 就會在前景執行</span>
+<span class="nv">$ </span>docker-compose up <span class="nt">-d</span>
+<span class="nv">$ </span>docker-compose <span class="nt">-p</span> 專案名稱 up <span class="nt">-d</span>
+</code></pre></div></div>
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/3.jpg" alt="" /></p>
+
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/4.jpg" alt="" /></p>
+
+<p><img src="/assets/images/2022-07-05-Run-multiple-containers-with-Docker-Compose-22/5.jpg" alt="" /></p>
+
+<p>可以看到剛建立的資料卷及網路前面都會加上「nodered_」字串，是因為那個字串預設會是 docker-compose.yml 所在資料夾的名稱，並會移除資料夾名稱中的非英數字元，如果想指定專案名稱可以加上 <code class="language-plaintext highlighter-rouge">-p</code> 選項。</p>
+
+<h3 id="4-執行-docker-composeyml-內的服務">4. 執行 docker-compose.yml 內的服務</h3>
+<blockquote class="prompt-info">
+  <p>docker-compose 指令幾乎只接受 <strong>services 名稱</strong>，而不是 Container 名稱，所以不一定要特別設定 Container 名稱，這樣也可以避免 Container 名稱衝突而無法建立成功。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose <span class="nb">exec</span> 
+<span class="nv">$ </span>docker-compose <span class="nb">exec</span> <span class="nt">-it</span> db /bin/bash （db 是 services 名稱）
+</code></pre></div></div>
+<blockquote class="prompt-warning">
+  <p>注意！如果是用 <code class="language-plaintext highlighter-rouge">docker exec</code> 就要使用 Container 名稱。 
+<code class="language-plaintext highlighter-rouge">docker exec -it node-red-counchdb</code></p>
+</blockquote>
+
+<h2 id="六dockerfile-和-docker-composeyml-差異">六、Dockerfile 和 docker-compose.yml 差異</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>名稱</th>
+      <th>所屬的腳本檔</th>
+      <th>用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dockerfile</td>
+      <td>docker build</td>
+      <td>注重在如何產生一個新的 Image</td>
+    </tr>
+    <tr>
+      <td>docker-compose.yml</td>
+      <td>Docker Compose</td>
+      <td>比較像 <code class="language-plaintext highlighter-rouge">docker run</code>，用來告訴 Docker 如何啟動、運行和連結 Container</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="七docker-composeyml-常用指令">七、docker-compose.yml 常用指令</h2>
+<h3 id="1-version">1. version</h3>
+<p><strong>用途：指定該 docker-compose.yml 檔案所使用的格式版本。</strong></p>
+
+<p>不同的 Docker 及 Docker Compose 版本所支援的 docker-compose.yml 格式和指令略有不同，而 docker-compose.yml 共有三個主要版本，最新版本是 Version 3.8 (2022/07)，各版本差異主要是在 yaml 檔案可以使用的指令數不同，版本越新支援越多指令。</p>
+
+<p>docker-compose.yml 版本和 Docker 版本相關，舊版 Docker 上無法用新版的 docker-compose.yml 格式。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3"</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3.0"</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3.8"</span>
+</code></pre></div></div>
+
+<h3 id="2-services">2. services</h3>
+<p><strong>用途：指定該 docker-compose.yml 檔案需要啟動的所有的 Container 的啟動及設定資訊。</strong></p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span> 
+    <span class="na">image</span><span class="pi">:</span> <span class="s">xxxxxxxx</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">xxxxxxxxx</span>
+</code></pre></div></div>
+
+<h3 id="3-container_name">3. container_name</h3>
+<p><strong>用途：指定每一個 service 下的 Container 名稱。</strong></p>
+
+<p>不過由 docker-compose.yml 啟動的 Container 都可以透過 docker-compose 指令和 services 名稱進行操作，因此 Container 的名稱就不用非要指定。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span> 
+    <span class="na">image</span><span class="pi">:</span> <span class="s">xxxxxxxx</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">node-red-web</span>
+</code></pre></div></div>
+
+<h3 id="4-image">4. image</h3>
+<p><strong>用途：指定某一個 service 所要使用的 image 檔案名稱和標籤。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 <code class="language-plaintext highlighter-rouge">docker run</code> 和 Dockerfile 的 <code class="language-plaintext highlighter-rouge">FROM</code> 相同。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.13.3</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">ayubiz/nginx</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">ayubiz/nginx:1.13.3</span>
+<span class="na">image</span><span class="pi">:</span> <span class="s">f4114aea</span>
+</code></pre></div></div>
+
+<h3 id="5-build">5. build</h3>
+<p><strong>用途：另一種取得 image 的方式，只要指定 Dockerfile 所在的資料夾即可。</strong></p>
+
+<h4 id="1-如果檔案名稱叫做-dockerfile">(1) 如果檔案名稱叫做 Dockerfile</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">/home/ayubiz</span>
+</code></pre></div></div>
+
+<h4 id="2-如果檔案名稱是自訂的要多加一個-dockerfile-指令">(2) 如果檔案名稱是自訂的，要多加一個 dockerfile 指令</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">/home/ayubiz</span>
+    <span class="na">dockerfile</span><span class="pi">:</span> <span class="s">ayu.txt</span>
+</code></pre></div></div>
+
+<h4 id="3-如果需要更改產出的-image-檔案的名稱和標籤可以同時使用-build-和-image-指令">(3) 如果需要更改產出的 image 檔案的名稱和標籤，可以同時使用 build 和 image 指令</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">. (目前所在資料夾)</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">ayubiz:demo</span>
+</code></pre></div></div>
+
+<h3 id="6-command">6. command</h3>
+<p><strong>用途：指定 Container 啟動後執行的指令，用以取代掉 Image 檔案內原有的啟動指令（改變 Container 原有的執行指令）。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 Dockerfile 的 <code class="language-plaintext highlighter-rouge">CMD</code> 相同。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">nginx"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">-g"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">daemon</span><span class="nv"> </span><span class="s">off;"</span><span class="pi">]</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">nginx -g "daemon off;"</span>
+</code></pre></div></div>
+
+<h3 id="7-entrypoint">7. entrypoint</h3>
+<p><strong>用途：覆寫掉 Image 檔案內原有的 ENTRYPOINT 指令。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 Dockerfile 的 <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> 類似。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">entrypiont</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">nignx</span>
+      <span class="pi">-</span> <span class="s">g</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">daemon</span><span class="nv"> </span><span class="s">off;"</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">nginx -g "daemon off;"</span>
+</code></pre></div></div>
+
+<h3 id="8-environment">8. environment</h3>
+<p><strong>用途：用以設定該 services 的環境變數。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 docker run -e 或是 Dockerfile 的 <code class="language-plaintext highlighter-rouge">ENV</code> 類似。</p>
+</blockquote>
+
+<p>平常設定值不需要使用雙引號，不過 YAML 檔會解析 <code class="language-plaintext highlighter-rouge">true/false</code> 及 <code class="language-plaintext highlighter-rouge">yes/no</code> 這兩組關鍵字，所以會需要加上雙引號避免被轉換成布林值而產生錯誤。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">USER</span><span class="pi">:</span> <span class="s">ayubiz</span>
+      <span class="na">ROOT</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+      <span class="na">NO_PW</span><span class="pi">:</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 此種方式能免去減少雙引號的問題</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">USER</span><span class="pi">:</span> <span class="s">ayubiz</span>
+      <span class="na">ROOT</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+      <span class="na">NO_PW</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<h3 id="9-env_file">9. env_file</h3>
+<p><strong>用途：將變數檔案路徑及檔案名稱事先寫在文字檔，並直接引用到 docker-compose.yml 內，可以省去用 <code class="language-plaintext highlighter-rouge">environment</code> 逐一設定的麻煩。</strong></p>
+
+<blockquote class="prompt-warning">
+  <p>注意！同樣的變數名稱，會以 <code class="language-plaintext highlighter-rouge">environment</code> 指令的設定為準，如果多個變數檔都有設定同一個變數名時，以最後加入的那個檔案的變數值為主。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">env_file</span><span class="pi">:</span> <span class="s">aybiz.txt</span>
+</code></pre></div></div>
+<p>或是</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">env_file</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="s">./ayubiz.txt</span>
+      <span class="pi">-</span> <span class="s">./env/ayubiz.txt</span>
+      <span class="pi">-</span> <span class="s">/tmp/ayubiz.txt</span>
+</code></pre></div></div>
+
+<h3 id="10-expose">10. expose</h3>
+<p><strong>用途：用以設定要啟用的連結埠號。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 Dockerfile 的 <code class="language-plaintext highlighter-rouge">EXPOSE</code> 相同。</p>
+</blockquote>
+
+<p>啟用的連結埠號除了提供給同一個 Docker Network 的其他 Container/Service 存取外，並不能直接給主機的程式使用
+避免不必要的錯誤發生，加雙引號會比較安全。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">expose</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443"</span>
+</code></pre></div></div>
+
+<h3 id="11-ports">11. ports</h3>
+<p><strong>用途：將主機的連結埠號對應到 Container/Service 所啟用（Expose）的連結埠號，如果沒有要將 Container/Service 所啟用的連結埠號開給主機上的程式或是其他不在同一個 Docker Network 的 Container 所使用就不需要用到。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 docker run -p 相似。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>       
+  <span class="na">http</span><span class="pi">:</span>       
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>       
+    <span class="na">ports</span><span class="pi">:</span>       
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80"</span>  <span class="c1"># 指定主機的 80 埠對應到 Container 的 80 埠      </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080-8088"</span>   <span class="c1"># 指定主機的 8080 至 8088 之間的埠號對應到 Container 的 8080 至 8088 之間的埠號    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>   <span class="c1"># 指定主機的 80 埠對應到 Container 的 80 埠    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080-8090:80-90"</span>   <span class="c1"># 指定主機的 8080 至 8090 之間的埠號對應到 Container 的 80 至 90 之間的埠號    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">127.0.0.1:8080:80"</span>   <span class="c1"># 指定主機的 127.0.0.1 網址的 8080 埠號對應到 Container 的 80 埠號    </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">127.0.0.1:8080-8090:80-90"</span>     <span class="c1"># 指定主機的 127.0.0.1 網址的 8080 至 8090 之間的埠號對應到 Container 的 80 至 90 之間的埠號  </span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">16882:16882/udp"</span>   <span class="c1"># 指定主機的 16882 埠號對應到 Container 的 16882 埠號的 UDP 通訊協定    </span>
+</code></pre></div></div>
+
+<h3 id="12-restart">12. restart</h3>
+<p><strong>用途：設定 Container 自動重新啟動的模式。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 <code class="language-plaintext highlighter-rouge">docker run --restart</code> 相同。</p>
+</blockquote>
+
+<p><code class="language-plaintext highlighter-rouge">restart</code> 預設值為 <code class="language-plaintext highlighter-rouge">no</code>，其他設定值可以是 <code class="language-plaintext highlighter-rouge">no</code>、<code class="language-plaintext highlighter-rouge">always</code>、<code class="language-plaintext highlighter-rouge">on-failure</code>、<code class="language-plaintext highlighter-rouge">unless-stopped</code>。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+  <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+</code></pre></div></div>
+
+<h3 id="13-volumes">13. volumes</h3>
+<p><strong>用途：用於掛載主機的資料夾和檔案或外部資料卷到 Container 的指定資料夾或檔案裡</strong></p>
+
+<blockquote class="prompt-info">
+  <p>用法跟 <code class="language-plaintext highlighter-rouge">docker run -v</code> 相同。</p>
+</blockquote>
+
+<h4 id="1-services-指令下的-volumes指定-container-要掛載的資料卷">(1) services 指令下的 volumes：指定 Container 要掛載的資料卷</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="c1"># 由 docker 自動建立相同路徑名稱的資料卷掛載到此路徑</span>
+      <span class="pi">-</span> <span class="s">/usr/share/nginx/html</span>
+
+      <span class="c1"># 指定主機的檔案路徑掛載到 Container 的指定路徑</span>
+      <span class="pi">-</span> <span class="s">/home/ayubiz/nginx/html:/usr/share/nginx/html</span>
+
+      <span class="c1"># 將 docker volume 建立的資料卷掛載到 Container 上</span>
+      <span class="pi">-</span> <span class="s">nginx-data:/usr/share/nginx/html</span>
+</code></pre></div></div>
+
+<h4 id="2-與-services-指令同層的-volumes-頂層建立一組新的資料卷">(2) 與 services 指令同層的 volumes （頂層）：建立一組新的資料卷</h4>
+<p>用頂層的 <code class="language-plaintext highlighter-rouge">volumes</code> 建立一個名為 <code class="language-plaintext highlighter-rouge">nginx-data</code> 的資料卷後，就可以使用 services 下的 <code class="language-plaintext highlighter-rouge">volumes</code> 將命名好的資料卷進行掛載。</p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">nginx-data:/usr/share/nginx/html</span>
+<span class="na">volumes</span><span class="pi">:</span>
+    <span class="s">nginx-data</span>
+</code></pre></div></div>
+
+<h4 id="3-32-版以上-docker-composeyml-檔案格式支援條列式">(3) 3.2 版以上 docker-compose.yml 檔案格式支援條列式</h4>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3.2"</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">http</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">volume</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="s">nginx-data</span>
+        <span class="na">target</span><span class="pi">:</span> <span class="s">/usr/share/nginx/html</span>
+        <span class="na">volume</span><span class="pi">:</span>
+          <span class="na">nocopy</span><span class="pi">:</span> <span class="kc">true</span>
+<span class="na">volumes</span><span class="pi">:</span>
+  <span class="s">nginx-data</span>
+</code></pre></div></div>
+
+<h3 id="14-networks">14. networks</h3>
+<p><strong>指定 Container 要加入的 Docker Network 名稱。</strong></p>
+<h4 id="1-指定-container-要加入的-docker-network-名稱">(1) 指定 Container 要加入的 Docker Network 名稱</h4>
+
+<h4 id="2-與-services-指令同層的-networks頂層建立一組新的-docker-network提供給-services-指令所定義的-containerservice-使用">(2) 與 services 指令同層的 networks（頂層）：建立一組新的 Docker Network，提供給 services 指令所定義的 Container/Service 使用</h4>
+
+<blockquote class="prompt-info">
+  <p>可以使用頂層的 <code class="language-plaintext highlighter-rouge">networks</code> 定義多個 Docker Network，且每一個 services 下的 Container 也可以透過 <code class="language-plaintext highlighter-rouge">networks</code> 同時加入多個 Docker Network。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">node-red-net</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">counchdb:latest</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">node-red-net</span>
+
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="s">node-red-net</span>
+</code></pre></div></div>
+
+<h3 id="15-depends_on">15. depends_on</h3>
+<p><strong>用途：可以改變 docker-compose.yml 檔案裡面各個 Container/Service 的啟動順序。</strong></p>
+
+<p>只要在 <code class="language-plaintext highlighter-rouge">node-red</code> 服務下方加上下面的 <code class="language-plaintext highlighter-rouge">depends_on</code>，就可以讓 <code class="language-plaintext highlighter-rouge">node_red</code> 在 <code class="language-plaintext highlighter-rouge">db</code> 啟動完成後再啟動，但可能會發生 <code class="language-plaintext highlighter-rouge">node-red</code> 在 <code class="language-plaintext highlighter-rouge">db</code> 啟動完成後要啟動，但 Couchdb Server 還沒有啟動完成而無法連線的問題。</p>
+
+<blockquote class="prompt-warning">
+  <p>注意！啟動完成是指 Container 本身，不是 Container 內的程式或服務啟動完成。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">db"</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">counchdb:latest</span>
+</code></pre></div></div>
+
+<h3 id="16-external_links--link">16. external_links | link</h3>
+<p>這兩個指令大部分已經可以透過 Docker Nerwork 功能自動達成，建議改用 <code class="language-plaintext highlighter-rouge">networks</code> 建立 Docker Network 達成相關功能。</p>
+
+<h3 id="17-extra_hosts">17. extra_hosts</h3>
+<p><strong>用途：設定其他主機的 IP 和網域名稱做對應，設定完後打開 /etc/hosts 檔案會發現多出剛剛設定的紀錄。</strong></p>
+
+<blockquote class="prompt-info">
+  <p>和直接去 Container 的 /etc/hosts 檔案裡加入新的主機的作用相同。</p>
+</blockquote>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">node-red</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">extra_hosts</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">webapp1:192.168.1.10"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">webapp2:192.168.99.101"</span>
+</code></pre></div></div>
+
+<h3 id="18-dns">18. dns</h3>
+<p><strong>用途：設定 DNS 伺服器，該服務啟動的 Container 的 DNS 伺服器就會被變更為設定的 DNS 伺服器位址。</strong></p>
+
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">services"</span>
+  <span class="s">node-red</span><span class="err">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nodered/node-red-docker:slim</span>
+    <span class="na">dns</span><span class="pi">:</span> <span class="s">9.9.9.9</span>
+
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">couchdb:latest</span>
+    <span class="na">dns</span><span class="pi">:</span> 
+      <span class="pi">-</span> <span class="s">168.95.1.1</span>
+       <span class="s">- 168.95.192.1</span>
+</code></pre></div></div>
+
+<h3 id="19-labels">19. labels</h3>
+<p><strong>用途：將 Image 檔的作者、版本、描述、其他自訂資訊儲存到新產生的 Image 檔。</strong></p>
+<blockquote class="prompt-info">
+  <p>用途和 Dockerfile 的 <code class="language-plaintext highlighter-rouge">LABEL</code> 相同。</p>
+</blockquote>
+
+<h2 id="八docker-compose-常用指令">八、Docker Compose 常用指令</h2>
+<p>用 docker-compose 指令操作的好處在於可以對指定的 docker-compose.yml 檔案內所啟動的 Container 做整批的操作，而不需要一個一個處理。</p>
+
+<p>docker-compose 指令必須在有 docker-compose.yml 檔案路徑和名稱才能夠正常使用。</p>
+
+<h3 id="1-config">1. config</h3>
+<p><strong>用途：驗證或檢視  docker-compose.yml 的內容，而不用透過實際執行才能發現錯誤。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose config
+</code></pre></div></div>
+
+<h3 id="2-build">2. build</h3>
+<p><strong>用途：如果 docker-compose.yml 檔案裡有使用到 Dockerfile 來產生 Docker Image 的話，可以使用 <code class="language-plaintext highlighter-rouge">build</code> 來產生所需的 Docker Image，但如果 docker-compose.yml 檔案裡沒有指定 Dockerfile，用 <code class="language-plaintext highlighter-rouge">build</code> 就不會有任何產出。</strong></p>
+
+<p>如果所使用的 Dockerfile 的內容有變動時，也可以使用 <code class="language-plaintext highlighter-rouge">build</code> 重新產生 docker image。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose build          
+</code></pre></div></div>
+
+<h3 id="3-pull">3. pull</h3>
+<p><strong>用途：下載 docker-compose.yml 中指定要取得的 Image，可指定一或多個服務的名稱，若沒指定就會下載 docker-compose.yml 檔案裡所有指定的 Image 檔。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose pull node-red db         
+<span class="nv">$ </span>docker-compose pull
+</code></pre></div></div>
+
+<h3 id="4-start--stop--restart--pause--unpause--kill">4. start | stop | restart | pause | unpause | kill</h3>
+<p><strong>用途：啟動、停止、重新啟動、暫停、取消暫停和強制停止 docker-compose.yml 檔案內的 Container。</strong>        <br />
+如果不指定 Container，會預設對 docker-compose.yml 檔案內所有 Container 做操作（譬如：不指定就會停止所有 Container 的運行）。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose stop         
+<span class="nv">$ </span>docker-compose stop node-red db
+</code></pre></div></div>
+
+<h3 id="5-rm">5. rm</h3>
+<p><strong>用途：移除已經停止運行的 Container，可指定一或多個 Container 的名稱，若沒指定就會移除 docker-compose 檔案裡全部停用的 Container。</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -s 可以移除仍在運行中的 Container         </span>
+<span class="nv">$ </span>docker-compose <span class="nb">rm</span> <span class="nt">-v</span>          
+<span class="nv">$ </span>docker-compose <span class="nb">rm</span> <span class="nt">-v</span> node-red           
+<span class="nv">$ </span>docker-compose <span class="nb">rm</span> <span class="nt">-s</span> node-red
+</code></pre></div></div>
+
+<h3 id="6-run">6. run</h3>
+<p><strong>用途：主要是利用 <code class="language-plaintext highlighter-rouge">services</code> 所設定好的各項設定值，然後搭配要執行的命令來啟動服務。</strong></p>
+
+<p>docker-compose run 的選項有：<code class="language-plaintext highlighter-rouge">-d</code>、<code class="language-plaintext highlighter-rouge">--name</code>、<code class="language-plaintext highlighter-rouge">--rm</code>、<code class="language-plaintext highlighter-rouge">-p</code>、<code class="language-plaintext highlighter-rouge">--entrypoint</code>、<code class="language-plaintext highlighter-rouge">--workdir</code>、<code class="language-plaintext highlighter-rouge">-v</code>、<code class="language-plaintext highlighter-rouge">--no-deps</code>。</p>
+
+<p><code class="language-plaintext highlighter-rouge">--no-deps</code>：啟動服務時，不去啟動相連或相依的服務。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># node-red 是 services 名稱不是 Image 名稱</span>
+<span class="nv">$ </span>docker-compose run node-red         
+</code></pre></div></div>
+
+<h3 id="7-up最常用的指令">7. up（最常用的指令）</h3>
+<p><strong>用途：將撰寫好的 docker-compose.yml 建立，並啟動所有的服務。</strong></p>
+
+<p>用 docker-compose.yml 啟動 Container，若沒另外指定專案名稱，預設是資料夾名。</p>
+
+<p><code class="language-plaintext highlighter-rouge">--no-recreate</code>：無論  docker-compose.yml 或 Image 檔有無調整或改變，都不需要重製每個服務所使用的 Container        <br />
+<code class="language-plaintext highlighter-rouge">--force-recreate</code>：無論  docker-compose.yml 或 Image 檔有無調整或改變，都要強迫執行重新建立服務所使用的 Container 的動作</p>
+
+<blockquote class="prompt-info">
+  <p>注意！ <code class="language-plaintext highlighter-rouge">--no-recreate</code> 和 <code class="language-plaintext highlighter-rouge">--force-recreate</code> 對於已經啟動的服務的 Container 都會先停止運行後，再依要求只重新啟動或重建後重新啟動。</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -d：在背景模式執行，如果沒有加上 -d，Container 就會在前景執行          </span>
+<span class="nv">$ </span>docker-compose up <span class="nt">-d</span>          
+<span class="nv">$ </span>docker-compose <span class="nt">-p</span> 專案名稱 up  <span class="nt">-d</span>         
+</code></pre></div></div>
+
+<h3 id="8-version">8. version</h3>
+<p><strong>用途：查看 docker-compose 版本的方式。</strong></p>
+
+<h3 id="9-logs">9. logs</h3>
+<p><strong>用途：查看 Container 所輸出的 log 訊息。</strong>       <br />
+跟 <code class="language-plaintext highlighter-rouge">docker logs</code> 用途和用法相同，但 <code class="language-plaintext highlighter-rouge">docker-compose logs</code> 不支援以指定的起始時間查詢 log 及額外詳細的 log 顯示方式。</p>
+
+<h3 id="10-port">10. port</h3>
+<p><strong>用途：查詢 Container 內部的通訊埠所對應的外部 IP 位址和通訊埠號。</strong>      <br />
+與 <code class="language-plaintext highlighter-rouge">docker ps</code> 差別在於 <code class="language-plaintext highlighter-rouge">docker ps</code> 不用指定要查詢的通訊埠號。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查詢 node-red 服務的 1880 埠號在 Container 外所對應的 IP 位址和通訊埠號       </span>
+<span class="nv">$ </span>docker-compose port node-red 1880  
+</code></pre></div></div>
+
+<h3 id="11-ps">11. ps</h3>
+<p><strong>用途：顯示所使用的 docker-compose.yml 在 services 項目下定義的 Container 的狀態（包含啟動中和非啟動中），並不是所有的 Container 的狀態。</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose ps         
+
+<span class="c"># 只顯示 Container ID 資訊</span>
+<span class="nv">$ </span>docker-compose ps <span class="nt">-q</span>    
+</code></pre></div></div>
+
+<h3 id="12-help">12. help</h3>
+<p><strong>用途：查訊個別指令選項的使用方式和參數</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose start <span class="nt">--help</span>     
+
+<span class="c"># docker 指令不支援這個操作      </span>
+<span class="nv">$ </span>docker-compose start -?       
+</code></pre></div></div>
+
+<h2 id="九何時要使用-docker-compose-指令">九、何時要使用 Docker Compose 指令？</h2>
+<p>docker-compose 指令和 docker 指令相同，所以時常會搞不清楚要用那個指令。</p>
+
+<p>經過上面可知，docker-compose 指令操作都是基於 docker-compose.yml，如果想要操作的 Container 是由某一個 docker-compose.yml 檔案所定義和產生時，就用 docker-compose 指令來操作，可以少打一些字，因為它會自動去參考 docker-compose.yml 的相關設定。</p>
+
+<p>docker-compose 指令可以容易的進行批次操作，可以一次啟用或停用 docker-compose.yml 所定義的所有的 Container，不用像 docker 指令要一一列出想用啟用或停用的 Container。</p>
+
+<p>另外，docker 指令使用 Container 名稱作為指令的參數，而 docker-compose 指令則多是以 docker-compose.yml 檔案裡的「服務名稱」來作為參數使用，不直接給 Container 的名稱。</p>
+
+<h2 id="參考資料">參考資料</h2>
+<ul>
+  <li>Docker 這樣學才有趣：從入門，到玩直播、挖礦</li>
+</ul>]]></content><author><name>GiantFred</name></author><category term="Docker" /><category term="centos" /><category term="docker" /><category term="container" /><category term="docker-compose" /><summary type="html"><![CDATA[使用的環境]]></summary></entry></feed>
